@@ -1126,9 +1126,11 @@ h3 { font-size: 0.85em; font-weight: 400; color: var(--text2); margin-bottom: 10
         <button class="btn btn-secondary btn-sm" onclick="advancePlot()" title="推进剧情" style="flex-shrink:0;">▶</button>
         <input type="text" id="chat-input" placeholder="输入你的行动..." onkeydown="if(event.key==='Enter')sendMessage()">
         <button class="btn btn-primary btn-sm" onclick="sendMessage()" style="flex-shrink:0;">发送</button>
+        <button class="btn btn-secondary btn-sm" onclick="undoLastExchange()" title="撤回最新一轮对话" style="flex-shrink:0;">↩</button>
         <button class="btn btn-gold btn-sm" onclick="toggleStatusPanel()" title="查看状态" style="flex-shrink:0;">📋</button>
         <button class="btn btn-accent btn-sm" onclick="openRiderPanel()" title="骑士身份" style="flex-shrink:0;">⚡</button>
         <button class="btn btn-secondary btn-sm" onclick="resetChat()" title="重置对话" style="flex-shrink:0;">🔄</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportChatHistory()" title="导出聊天记录" style="flex-shrink:0;">📤</button>
         <button class="btn btn-gold btn-sm" onclick="openSavePanel()" title="存档管理" style="flex-shrink:0;">💾</button>
         <button class="btn btn-accent btn-sm" onclick="openAchievementPanel()" title="成就" style="flex-shrink:0;">🏆</button>
       </div>
@@ -1284,6 +1286,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'立花藤兵卫: 赛车教练，本乡猛的导师和精神支柱，从1号到Stronger一直支持着骑士们。泷和也: FBI探员，协助骑士对抗修卡。绿川琉璃子: 绿川博士的女儿，勇敢的记者。绿川弘博士: 将本乡猛改造为骑士的科学家，被修卡杀害。',
         worldSetting:'舞台为1970年代初的日本。邪恶组织修卡企图通过改造人技术征服世界，将普通人类绑架并改造为怪人。假面骑士1号和2号是被修卡改造的人类，但他们在脑改造前逃脱，保留了人性。骑士的变身腰带"台风"通过风车驱动，在高速骑行时吸收风压启动。骑士们的基地是立花赛车俱乐部，立花藤兵卫是他们的导师。修卡的组织结构模仿纳粹，有严格的等级制度。',
         desc:'邪恶组织修卡企图征服世界，将本乡猛改造为蝗虫怪人。在脑改造前逃脱的他，化身为假面骑士1号，与同样命运的2号一起对抗修卡。这是所有传说的起点。',
+        keyItems:'台风腰带碎片, 修卡战斗员制服, 立花赛车俱乐部徽章',
         keywords:['改造人','修卡','蝗虫','摩托车','台风腰带'], powerLevel:'中低（改造人级别，靠体术与必杀技战斗）', locations:'立花赛车俱乐部、修卡基地、城南大学、东京市区',
         jp:{ series:'仮面ライダー (Kamen Rider 假面骑士)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダー1号(本郷猛)、仮面ライダー2号(一文字隼人)', belt:'タイフーン (Typhoon 台风腰带)', finishers:'ライダーキック (Rider Kick 骑士踢)、ライダーパンチ (Rider Punch 骑士拳)', villains:'ショッカー (Shocker 修卡)、ゲルショッカー (Gel Shocker 盖尔修卡)', vehicles:'サイクロン号 (Cyclone 旋风号)', catchphrase:'ライダー…変身！(Rider... Henshin! 骑士…变身！)', tosatsu:'トウサツ！(Tosatsu! 藤兵卫！)' } },
       { id:'v3', year:'1973', name:'假面骑士V3', sub:'V3·骑士人', hero:'风见志郎 / 结城丈二', villain:'迪斯特龙',
@@ -1300,6 +1303,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'立花藤兵卫: 继续担任V3的导师和后勤支持。珠纯子: 立花藤兵卫的助手，V3的战友。志度博士: 科学家，协助V3开发装备。',
         worldSetting:'舞台为1973年的日本。迪斯特龙是继承了修卡遗产的国际邪恶组织，比修卡更加庞大和凶残。V3的"双重台风腰带"是1号与2号腰带技术的结晶。V3拥有26种秘密能力，可在战斗中灵活运用。骑士人是第一个没有变身能力的骑士，但他的机械义肢和战斗技巧同样出色，开创了"准骑士"的先河。立花赛车俱乐部仍然是骑士们的基地。',
         desc:'1号和2号的后辈。风见志郎被迪斯特龙杀害全家，濒死时被1号2号改造为V3。他拥有1号的技术与2号的力量，26种秘密能力是他的王牌。',
+        keyItems:'双重台风腰带核心, 骑士人机械义肢图纸, 26种秘密能力手册',
         keywords:['双重改造','26种能力','迪斯特龙','骑士人'], powerLevel:'中（26种秘密能力，综合战力强于前代）', locations:'立花赛车俱乐部、迪斯特龙基地、风见家、东京',
         jp:{ series:'仮面ライダーV3 (Kamen Rider V3 假面骑士V3)', henshin:'変身！V3！(Henshin! V3! 变身！V3！)', riders:'仮面ライダーV3(風見志郎)、ライダーマン(結城丈二)', belt:'ダブルタイフーン (Double Typhoon 双重台风腰带)', finishers:'V3キック (V3 Kick 骑士踢)、V3回転キック (V3回转踢)', villains:'デストロン (Destron 迪斯特龙)', vehicles:'ハリケーン (Hurricane 飓风号)', catchphrase:'26の秘密！(26 no Himitsu! 26种秘密能力！)' } },
       { id:'x', year:'1974', name:'假面骑士X', sub:'深海骑士', hero:'神敬介', villain:'GOD机关',
@@ -1316,6 +1320,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'神启太郎博士: 神敬介的父亲，天才科学家，在临死前将儿子改造为X骑士。立花藤兵卫: 一如既往地支持着骑士。水城凉子: 神敬介的朋友，协助调查GOD机关。',
         worldSetting:'舞台为1974年的日本。GOD机关是一个以深海为基地的邪恶组织，其名称来源于古代希腊神话中的神祇。X骑士是专门为深海环境设计的改造人，他的变身腰带"红风车"在陆地和水下都能启动。莱德鲁棍是X骑士的标志性武器，可伸缩、可变形，配合X骑士的棍术使用。GOD机关的怪人主要以海洋生物为设计原型，体现了深海主题。X骑士开创了"使用武器战斗"的骑士风格。',
         desc:'神敬介与父亲被GOD机关袭击，濒死的父亲将其改造为深海开发用改造人。X骑士擅长水下战斗，手持莱德鲁棍，为打破GOD的野心而战。',
+        keyItems:'莱德鲁棍核心, 深海开发用呼吸器, GOD机关密文',
         keywords:['深海','GOD机关','莱德鲁棍','海洋'], powerLevel:'中低（深海作战特化，Ridol棍武装）', locations:'神敬介的船屋、GOD机关基地、城南大学、东京',
         jp:{ series:'仮面ライダーX (Kamen Rider X 假面骑士X)', henshin:'セットアップ！(Set Up! 装备！)', riders:'仮面ライダーX(神敬介)', belt:'レッドボルテックス (Red Vortex 红风车腰带)', finishers:'Xキック (X Kick)、ライドルスティック攻撃 (Ridol Stick 莱德鲁棍攻击)', villains:'GOD機関 (GOD Kikan GOD机关)', vehicles:'クルーザー (Cruiser 巡洋舰号)', catchphrase:'ライドルスティック！(Ridol Stick! 莱德鲁棍！)', weapon:'ライドルスティック (Ridol Stick 莱德鲁棍)' } },
       { id:'amazon', year:'1974', name:'假面骑士Amazon', sub:'野性骑士', hero:'山本大介', villain:'奇顿 / 加兰达帝国',
@@ -1332,6 +1337,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'冈村雅彦: 少年，Amazon在日本唯一的朋友，多次帮助Amazon。长老巴格: 亚马逊丛林的印加长老，抚养山本大介长大。立花藤兵卫: 一如既往地支持Amazon。',
         worldSetting:'舞台为1974年的日本。Amazon的背景设定在亚马逊丛林，融入了古代印加文明的元素。叽叽臂环是印加文明的秘宝，赋予Amazon变身的能力。与其他骑士不同，Amazon不使用腰带变身，而是通过臂环进行变异。他的战斗方式极其原始野性，使用利爪、獠牙和"大切断"作为必杀技。Amazon是系列中风格最独特的作品之一，充满了野性和原始的力量感。',
         desc:'在亚马逊长大的青年山本大介，移植了古代印加秘宝"叽叽臂环"。为保护臂环不被邪恶组织夺走，他化身野性的Amazon骑士，用利爪与獠牙战斗。',
+        keyItems:'基基手环, 印加秘药, 大切断修行卷轴',
         keywords:['亚马逊','印加','臂环','野性','大切断'], powerLevel:'中低（野性战斗风格，大切断为必杀）', locations:'亚马逊丛林、冈村家、盖顿基地、东京',
         jp:{ series:'仮面ライダーアマゾン (Kamen Rider Amazon 假面骑士Amazon)', henshin:'ア・マ・ゾ・ン！(A-Ma-Zo-N! 亚马逊！)', riders:'仮面ライダーアマゾン(山本大介)', belt:'ギギの腕輪 (Gigi Armlet 叽叽臂环)', finishers:'大切断 (Dai Setsudan 大切断)、スーパー大切断 (Super Dai Setsudan 超级大切断)', villains:'ゲドン (Geddon 奇顿)、ガランダー帝国 (Garanda Empire 加兰达帝国)', vehicles:'ジャングラー (Jungler 丛林者号)', catchphrase:'大・切・断！(Dai·Setsu·Dan! 大·切·断！)' } },
       { id:'stronger', year:'1975', name:'假面骑士Stronger', sub:'电气骑士', hero:'城茂', villain:'黑撒旦 / 迪尔扎军团',
@@ -1348,6 +1354,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'岬百合子: 电波人Tackle，Stronger的搭档，日本特摄史上第一位女性战士主角。立花藤兵卫: 最后一部由立花藤兵卫担任常规角色的骑士作品。',
         worldSetting:'舞台为1975年的日本。黑撒旦是一个以电气改造技术为核心的邪恶组织。Stronger是第一个使用电气能力的骑士，他的超电磁充电强化(Charge Up)是昭和骑士中最具代表性的强化形态。电波人Tackle是假面骑士系列中第一位女性战士，虽然她不是正式的假面骑士，但她的牺牲成为系列经典场景。Stronger是昭和骑士系列的集大成之作，也是立花藤兵卫作为常规角色的最后一部作品。',
         desc:'城茂为复仇主动接受黑撒旦的改造，成为电气人Stronger。与电波人Tackle并肩作战，他的"超电磁放电"是史上最强必杀之一。',
+        keyItems:'超电子改造手术记录, 电波人间装置, Tackle遗物',
         keywords:['电气','黑撒旦','Tackle','超电磁'], powerLevel:'中高（电气能量，Charge Up超电子强化）', locations:'城南大学、黑撒旦基地、德尔扎军团基地、东京',
         jp:{ series:'仮面ライダーストロンガー (Kamen Rider Stronger 假面骑士Stronger)', henshin:'変身！ストロンガー！(Henshin! Stronger! 变身！Stronger！)', riders:'仮面ライダーストロンガー(城茂)、電波人間タックル(岬百合子)', belt:'エレクトラー (Electrer 电气腰带)', finishers:'超電磁放電キック (Super Electro Kick 超电磁放电踢)、ストロンガーキック (Stronger Kick)', villains:'ブラックサタン (Black Satan 黑撒旦)、デルザー軍団 (Delza Army 迪尔扎军团)', vehicles:'カブトロー (Kabutoro 甲虫女皇号)', catchphrase:'チャージアップ！(Charge Up! 充电强化！)' } },
       { id:'skyrider', year:'1979', name:'假面骑士Sky', sub:'天空骑士', hero:'筑波洋', villain:'新修卡',
@@ -1364,6 +1371,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'志度博士: 将筑波洋改造为天空骑士的科学家，新修卡的前成员，因良心发现而背叛。叶月: 筑波洋的女友，一直支持他。谷源次郎: 咖啡店老板，为骑士提供后勤支援。',
         worldSetting:'舞台为1979年的日本。新修卡是修卡的继承组织，拥有更强的航空战斗能力。天空骑士是第一位能够自由飞行的假面骑士，标志着骑士系列进入"空中战斗"的时代。天空骑士的"龙卷风腰带"是志度博士开发的先进变身装置。99种必杀技的设定使天空骑士成为昭和骑士中技能最丰富的战士之一。本作也是假面骑士系列在电视上的回归之作（时隔4年）。',
         desc:'筑波洋被志度博士改造为天空骑士，拥有飞行能力。他翱翔于天际，对抗新修卡的威胁，是第一位能自由飞行的骑士。',
+        keyItems:'重力调节装置, 反修卡联盟徽章, 99种必杀技图谱',
         keywords:['飞行','新修卡','天空','重力降低'], powerLevel:'中（飞行能力，99种必杀技）', locations:'蓝天培训中心、新修卡基地、东京、谷源次郎的咖啡店',
         jp:{ series:'仮面ライダー (スカイライダー) (Skyrider 天空骑士)', henshin:'変身！(Henshin! 变身！)', riders:'スカイライダー(筑波洋)', belt:'トルネード (Tornado 龙卷风腰带)', finishers:'スカイキック (Sky Kick 天空踢)、99の必殺技 (99 no Hissatsu-waza 99种必杀技)', villains:'ネオショッカー (Neo Shocker 新修卡)', vehicles:'スカイターボ (Skyturbo 天空涡轮号)', catchphrase:'空を駆けるライダー！(Sora wo Kakeru Rider! 翱翔天空的骑士！)' } },
       { id:'super1', year:'1980', name:'假面骑士Super-1', sub:'宇宙骑士', hero:'冲一也', villain:'多格玛王国',
@@ -1380,6 +1388,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'少林寺师傅: 传授冲一也赤心少林拳的少林高僧。小百合: 冲一也的女友，在袭击中去世但一直活在他心中。玄海: 少林寺的师兄，协助Super-1。',
         worldSetting:'舞台为1980年的日本。Super-1是宇宙开发计划的产物，融合了宇宙科技和东方武术的元素。五种手臂装备的设计灵感来源于多功能工具，体现了"宇宙开发用"的主题。赤心少林拳是虚构的中国武术流派，强调心与技的统一。多格玛王国是来自宇宙的侵略者，标志着骑士系列开始涉及宇宙外星势力的威胁。',
         desc:'冲一也自愿成为宇宙开发用改造人Super-1，却因多格玛王国的袭击失去一切。他通过赤心少林拳的修行掌握变身，五种手臂装备应对不同战局。',
+        keyItems:'宇宙开发用火箭拳套, 太空站通信器, 五能手训练手册',
         keywords:['宇宙','多格玛','少林拳','五能手'], powerLevel:'中（宇宙训练，五种手部武装）', locations:'国际宇宙开发研究所、多格玛王国基地、宇宙空间站、东京',
         jp:{ series:'仮面ライダースーパー1 (Kamen Rider Super-1 假面骑士Super-1)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダースーパー1(沖一也)', belt:'サイクロン (Cyclone 回旋腰带)', finishers:'スーパー1キック (Super-1 Kick)、少林拳法必殺 (Shōrin Kenpō Hissatsu 少林拳法必杀)', villains:'ドグマ王国 (Dogma Kingdom 多格玛王国)、ジンドグマ (Jin Dogma 新多格玛)', vehicles:'Vマシン (V Machine V机器)', catchphrase:'赤心少林拳！(Sekishin Shōrin Ken! 赤心少林拳！)', fiveHands:'スーパーハンド (Super Hand 超级手)、エレキハンド (Eleki Hand 电力手)、冷熱ハンド (Reinetsu Hand 冷热手)、レーダーハンド (Radar Hand 雷达手)、マシンハンド (Machine Hand 机械手)' } },
       { id:'zx', year:'1984', name:'假面骑士ZX', sub:'忍者骑士', hero:'村雨良', villain:'巴丹',
@@ -1396,6 +1405,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'村雨静: 村雨良的姐姐，被巴丹杀害。十条骑士: 1号、2号、V3、骑士人、X、Amazon、Stronger、Skyrider、Super-1、ZX，在最终决战中并肩作战。',
         worldSetting:'舞台为1984年的日本。巴丹是昭和骑士中最强大的邪恶组织之一，拥有最先进的改造人技术。ZX被称为"完美改造人士兵"，是巴丹科技的巅峰之作。ZX的设计融合了忍者元素，使用手里剑、电磁刀等武器，具有极高的机动性和隐蔽性。本作是昭和骑士TV特别篇，以ZX为中心集结了全部十位昭和骑士，是昭和骑士的大团圆之作。',
         desc:'村雨良被巴丹改造为完美士兵ZX，却被洗脑。恢复记忆后，他化身忍者骑士，使用十字手里剑与电磁刀，是最强改造人计划的产物。',
+        keyItems:'忍者训练手册, 微型炸弹, 巴丹帝国情报地图',
         keywords:['忍者','巴丹','手里剑','改造士兵'], powerLevel:'中（忍者主题，全身武装化）', locations:'巴丹帝国基地、忍者村、东京',
         jp:{ series:'仮面ライダーZX (Kamen Rider ZX 假面骑士ZX)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーZX(村雨良)', belt:'ZXベルト (ZX Belt ZX腰带)', finishers:'ZXキック (ZX Kick)、十字手裏剣 (Jūji Shuriken 十字手里剑)、電磁刀斬撃 (Denjitō Zangeki 电磁刀斩击)', villains:'バダン (Badan 巴丹)', vehicles:'ヘルダイバー (Hell Diver 地狱潜行者号)', catchphrase:'忍者ライダー！(Ninja Rider! 忍者骑士！)' } },
       { id:'black', year:'1987', name:'假面骑士BLACK', sub:'世纪王', hero:'南光太郎', villain:'戈尔戈姆',
@@ -1412,6 +1422,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'秋月杏子: 光太郎的养妹，信彦的妹妹，一直支持光太郎。克美: 光太郎的女友。泷龙介: 摄影师，光太郎的朋友。',
         worldSetting:'舞台为1987年的日本。戈尔戈姆是一个拥有5000年历史的黑暗组织，其力量来源于帝王石。帝王石是戈尔戈姆的核心力量，BLACK和影月各有一颗。BLACK的变身腰带"帝王石腰带"在日蚀时获得最大力量。战蝗号(Battle Hopper)是拥有自我意识的机械蝗虫，是BLACK的忠实伙伴。本作是假面骑士系列的重启之作，回归改造人主题，但赋予了更深刻的人性探讨——兄弟对决、宿命论、自我认同。',
         desc:'南光太郎与养兄同在日蚀之日被戈尔戈姆选中，成为世纪王候选人。逃脱后成为BLACK，面对已成为影月的兄长，背负着悲壮的宿命。',
+        keyItems:'帝王石碎片, 戈尔戈姆祭坛遗物, 战蝗号钥匙链',
         keywords:['世纪王','日蚀','影月','戈尔戈姆','战蝗号'], powerLevel:'中高（帝王石之力，拥有毁灭世界的潜力）', locations:'秋月家、戈尔戈姆神殿、东京、鲷鱼烧店',
         jp:{ series:'仮面ライダーBLACK (Kamen Rider BLACK 假面骑士BLACK)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーBLACK(南光太郎)、シャドームーン(秋月信彦)', belt:'キングストーン (King Stone 帝王石腰带)', finishers:'ライダーキック (Rider Kick 骑士踢)、ライダーパンチ (Rider Punch 骑士拳)、キングストーンフラッシュ (King Stone Flash 帝王石闪光)', villains:'ゴルゴム (Gorgom 戈尔戈姆)、創世王 (Sōsei-ō 创世王)、大神官ダロム (Dalom 达罗姆)、大神官ビシュム (Bishum 比休姆)、大神官バラオム (Baraom 巴拉欧姆)', vehicles:'バトルホッパー (Battle Hopper 战蝗号)、ロードセクター (Road Sector 飞蝗号)', catchphrase:'俺は太陽の子供！黒きライダー！(Ore wa Taiyō no Kodomo! Kuroki Rider! 我是太阳之子！黑色的骑士！)' } },
       { id:'blackrx', year:'1988', name:'假面骑士BLACK RX', sub:'太阳之子', hero:'南光太郎', villain:'克莱西斯帝国',
@@ -1428,6 +1439,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'霞: 光太郎的女友，被克莱西斯帝国囚禁。白鸟玲子: 自由记者，协助光太郎调查克莱西斯。的场响子: 摄影师，白鸟玲子的搭档。',
         worldSetting:'舞台为1988年的日本。克莱西斯帝国是来自异次元的宇宙帝国，拥有远超地球的科技和军事力量。RX的太阳帝王石是帝王石吸收了太阳能量后进化而成的，赋予RX三种形态变化的能力——这是假面骑士历史上首次引入形态变换的概念。特技蝗虫号(Acrobatter)和雷多隆号(Ridoron)是RX的交通工具。RX是昭和骑士的最终章，也是力量最强的昭和骑士。',
         desc:'BLACK的续篇。南光太郎被克莱西斯帝国捕获并抛入太阳，却因帝王石的力量重生为RX。拥有三种形态变换，是昭和最强的骑士。',
+        keyItems:'太阳晶石碎片, 克莱西斯帝国徽章, 光剑剑柄',
         keywords:['太阳之子','克莱西斯','形态变化','光剑'], powerLevel:'高（三种形态变换，太阳帝王石之力）', locations:'佐原家、克莱西斯帝国、东京、怪魔界',
         jp:{ series:'仮面ライダーBLACK RX (Kamen Rider BLACK RX 假面骑士BLACK RX)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーBLACK RX(南光太郎)', belt:'サン・キングストーン (Sun King Stone 太阳帝王石腰带)', finishers:'RXキック (RX Kick)、リボルクラッシュ (Revol Crash 光剑必杀)、バイオブレード (Bio Blade 生化剑)', villains:'クライシス帝国 (Crisis Empire 克莱西斯帝国)、ジャーク将軍 (General Jark 杰克将军)、マリバロン (Maribaron 玛莉巴罗)、ボスガン (Bosgun 波斯卡)、ガテゾーン (Gatezone 盖多利安)', vehicles:'アクロバッター (Acrobatter 特技蝗虫号)、ライドロン (Ridoron 雷多隆号)', catchphrase:'太陽の子！RX！(Taiyō no Ko! RX! 太阳之子！RX！)', forms:'ロボライダー (Robo Rider 机械骑士)、バイオライダー (Bio Rider 生化骑士)' } },
       { id:'shin', year:'1992', name:'真·假面骑士', sub:'生化骑士', hero:'风祭真', villain:'财团',
@@ -1444,6 +1456,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'风祭新博士: 风祭真的父亲，被迫为财团进行生化实验，将儿子改造为生化战士。明日香: 风祭真的女友，被财团作为人质。',
         worldSetting:'舞台为1992年的日本。本作是回归石森章太郎原作精神的黑暗成人向作品，与TV版的儿童向风格完全不同。风祭真的变身不是通过腰带，而是体内生化变异——这种设定更接近石森原作的恐怖风格。真·假面骑士的造型更加生物化，强调昆虫特征和变异感。本作是"真·ZO·J"三部曲的第一部，以OVA形式发行，面向成年观众。',
         desc:'风祭真被父亲改造为生化战士，变身过程充满痛苦与恐怖。这是回归石森章太郎原作精神的黑暗成人向作品。',
+        keyItems:'生化改造手术记录, 财团秘密文件, 变异细胞样本',
         keywords:['生化改造','恐怖','成人向','变异'], powerLevel:'中低（生物变异型，纯肉体战斗）', locations:'城南大学遗传因子研究所、东京市区、地下实验室',
         jp:{ series:'真・仮面ライダー 序章 (Shin Kamen Rider: Prologue 真·假面骑士)', henshin:'肉体変異 (Nikutai Hen\'i 肉体变异，无变身台词)', riders:'真・仮面ライダー(風祭真)', belt:'なし (Nashi 无腰带，体内生化变异)', finishers:'真・ライダーキック (Shin Rider Kick)、生体爪撃 (Seitai Sōgeki 生化爪击)', villains:'財団 (Zaidan 神秘财团)', vehicles:'なし (Nashi 无，自身奔跑)', catchphrase:'俺は…人間か？それともバッタか？(Ore wa... Ningen ka? Soretomo Batta ka? 我是…人类？还是蝗虫？)' } },
       { id:'zo', year:'1993', name:'假面骑士ZO', sub:'完美生命体', hero:'麻生胜', villain:'新生命体',
@@ -1460,6 +1473,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'望月宏: 望月教授的儿子，与父亲不同，试图阻止父亲的疯狂计划。',
         worldSetting:'舞台为1993年的日本。ZO是"真·ZO·J"三部曲的第二部，以电影形式上映。ZO的设计理念是"完美生命体"，融合了生物科技和遗传因子工程的元素。Doras是新生命体，拥有不断进化的能力，从蛹体到成虫最终巨大化。ZO使用变身腰带进行变身，融合了遗传因子工程的生物科技。本作是假面骑士系列诞生20周年的纪念作品，回归了改造人主题。',
         desc:'麻生胜被望月教授改造为完美生命体ZO，沉睡多年后苏醒，对抗望月创造的恐怖新生命体。',
+        keyItems:'完美生命体设计图, 新生命体细胞, 麻生博士的研究笔记',
         keywords:['完美生命体','遗传因子','觉醒'], powerLevel:'中（蝗虫基因改造，身体能力强化）', locations:'新生命体研究所、望月博士的研究室、东京郊外',
         jp:{ series:'仮面ライダーZO (Kamen Rider ZO 假面骑士ZO)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーZO(麻生勝)', belt:'ZOベルト (ZO Belt ZO变身腰带)', finishers:'ZOキック (ZO Kick)、ZOパンチ (ZO Punch)', villains:'ドラス (Doras 新生命体)、望月教授 (Mochizuki Kyōju)', vehicles:'ZOチェイサー (ZO Chaser ZO追踪者号)', catchphrase:'完全なる生命体！(Kanzen naru Seimeitai! 完美生命体！)' } },
       { id:'j', year:'1994', name:'假面骑士J', sub:'巨大化骑士', hero:'濑川耕司', villain:'雾母',
@@ -1476,8 +1490,11 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'地底人: 居住在地底的神秘种族，将濑川耕司改造为J，请求他保护地球。少女: 被雾母追捕的少女，J保护的对象。',
         worldSetting:'舞台为1994年的日本。J是"真·ZO·J"三部曲的第三部，以电影形式上映。J的最大特色是巨大化能力——他可以吸收大地精灵的力量，将身体巨大化至数十米高。这一设定融合了假面骑士和巨大英雄（如奥特曼）的元素。J Spirit是大地精灵的力量，赋予J变身和巨大化的能力。本作是昭和骑士的最后一部电影作品。',
         desc:'濑川耕司被地底人改造为J，拥有巨大化的能力。为保护地球免受雾母的侵害，他以巨人姿态战斗。',
+        keyItems:'巨大化能量核心, 雾母之核碎片, 地底人遗物',
         keywords:['巨大化','地底人','雾母','J Power'], powerLevel:'中高（巨大化能力，Jumbo Formation）', locations:'东京、地底王国·镜子世界、湖畔',
         jp:{ series:'仮面ライダーJ (Kamen Rider J 假面骑士J)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーJ(瀬川耕司)', belt:'Jスピリット (J Spirit J Spirit腰带)', finishers:'Jキック (J Kick)、ジャンボライダーキック (Jumbo Rider Kick 巨大化骑士踢)', villains:'フォッグマザー (Fog Mother 雾母)', vehicles:'Jクロッサー (J Crosser J穿越者号)', catchphrase:'ジャンボフォーメーション！(Jumbo Formation! 巨大化！)' } },
+    ]
+  },
   heisei1: {
     name: '平成旧十年',
     desc: '革新与突破——跳出改造人框架，每部作品独立世界观。从空我温柔的力量到Decade毁灭一切的旅途，探讨人性、欲望、救赎与选择。',
@@ -1496,6 +1513,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'一条薰: 长野县刑警，五代的最佳搭档，一直追查古朗基事件。泽渡樱子: 考古学家，五代的朋友，帮助研究古朗基文字。榎田光: 警视厅科学家，为一条提供技术支持。朝比奈奈奈: 医生。五代稔: 五代的妹妹。',
         worldSetting:'舞台为2000年的日本东京及长野县。超古代文明遗留下来的战士"空我"与古朗基族之间的战斗。空我通过亚古鲁腰带变身，腰带由灵石"阿玛达姆"驱动。古朗基有严格的等级制度，通过杀人来升级。空我的形态变化与使用者精神状态相关，究极形态会带来毁灭性的黑暗力量。',
         desc:'长野县遗迹中沉睡的超古代战士空我复苏。冒险家五代雄介戴上亚古鲁腰带，化身为空我，以2000种技能与古朗基一族展开生死对决。为了保护每个人的笑容，他独自承受着究极黑暗的侵蚀。',
+        keyItems:'亚古鲁腰带碎片, 超古代文字石板, 哥莱姆陨石',
         keywords:['超古代','亚古鲁','古朗基','2000种技能','究极黑暗'], powerLevel:'极高（究极形态可毁灭世界，究极之暗）', locations:'长野县九郎岳遗迹、警视厅、城南大学、Pore Pore餐厅',
         jp:{ series:'仮面ライダークウガ (Kamen Rider Kuuga 假面骑士空我)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダークウガ(五代雄介)', belt:'アークル (Arcle 亚古鲁腰带)、アマダム (Amadam 灵石阿玛达姆)', finishers:'マイティキック (Mighty Kick 全能踢)、ライジングマイティキック (Rising Mighty Kick 升华全能踢)、アルティメットキック (Ultimate Kick 究极踢)', villains:'グロンギ (Gurongi 古朗基)、ン・ダグバ・ゼバ (N-Daguva-Zeba 零号·达古巴)、ラ・バルバ・デ (Ra-Baruba-De 玫瑰纹身女)', vehicles:'トライチェイサー2000 (TRCS-2000)、ビートチェイサー3000 (BTCS-3000)、ゴウラム (Gouram 装甲机)', catchphrase:'みんなの笑顔を守るために！(Minna no Egao wo Mamoru Tame ni! 为了保护大家的笑容！)', forms:'マイティ (全能/红)、ドラゴン (青龙/蓝)、ペガサス (天马/绿)、タイタン (泰坦/紫)、ライジング (升华)、アメイジングマイティ (惊异全能)、アルティメット (究极/黑)' } },
       { id:'agito', year:'2001', name:'假面骑士亚极陀', sub:'神之力量', hero:'津上翔一 / 冰川诚 / 苇原凉', villain:'Unknown/Lord',
@@ -1512,6 +1530,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'风谷真鱼: 拥有超能力的少女，津上翔一的朋友，能感知Unknown的出现。小泽澄子: 警视厅科学家，G3系统的开发者，天才女性。尾室隆弘: G3系统的操作员，小泽的助手。',
         worldSetting:'舞台为2001年的日本，是空我世界的延续。亚极陀之力是神赋予人类的进化种子，但神认为人类不配拥有它，因此派出Unknown猎杀亚极陀觉醒者。本作首次引入多骑士系统：Agito（超自然力量）、G3（人类科技）、Gills（不完整进化），三种不同的力量来源并行。Agito的形态变化代表了使用者精神状态的成长——从迷茫到觉醒，从大地到闪耀。',
         desc:'亚极陀之力在人类中觉醒。失忆青年津上翔一、警察冰川诚、游泳选手苇原凉，三人因不同原因获得亚极陀之力，对抗从天而降的Unknown。人类是否有资格拥有神的力量？',
+        keyItems:'亚极陀之光种子, 天亮号残骸, 超能力觉醒记录',
         keywords:['觉醒','神之力','Unknown','G3','多骑士'], powerLevel:'极高（无限进化潜力，闪耀形态光之力）', locations:'警视厅G3小队本部、天亮号事件现场、美杉家、东京',
         jp:{ series:'仮面ライダーアギト (Kamen Rider Agito 假面骑士亚极陀)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーアギト(津上翔一)、仮面ライダーG3(氷川誠)、仮面ライダーギルス(葦原涼)、仮面ライダーアナザーアギト(木野薫)', belt:'オルタリング (Alter Ring 亚极陀变身环)', finishers:'ライダーキック (Rider Kick 骑士踢)、シャイニングライダーキック (Shining Rider Kick 闪耀骑士踢)、フレイムセイバー (Flame Saber 火焰军刀)', villains:'アンノウン/ロード (Unknown/Lord 尊者)、黒衣の青年 (Overlord 暗之力)、水のエル (El of Water)、風のエル (El of Wind)、地のエル (El of Ground)', vehicles:'マシントルネイダー (Machine Tornador)', catchphrase:'人間は…進化する！(Ningen wa... Shinka suru! 人类…在进化！)', forms:'グランド (大地)、ストーム (暴风)、フレイム (火焰)、トリニティ (三位一体)、バーニング (燃烧)、シャイニング (闪耀)' } },
       { id:'ryuki', year:'2002', name:'假面骑士龙骑', sub:'镜世界', hero:'城户真司 / 秋山莲 等13人', villain:'镜怪物',
@@ -1528,6 +1547,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'神崎优衣: 神崎士郎的妹妹，幼年时去世，神崎士郎试图通过骑士战争复活她。桃井令子: ORB新闻社记者，真司的同事。大久保大介: ORB新闻社社长。',
         worldSetting:'舞台为2002年的日本。镜世界是一个与现实世界平行的异空间，只能通过镜面等反射面进出。骑士们在镜世界中战斗，普通人在镜世界中会被吞噬。骑士战争由神崎士郎策划，他利用镜世界的力量，让13位骑士互相残杀。骑士们通过V带扣卡组变身，使用降临卡片发动各种技能。契约兽是骑士在镜世界中的搭档，但需要以生命能量为食。本作以"不战斗就无法生存"为核心主题，是骑士系列中最为黑暗和残酷的作品之一。',
         desc:'13位假面骑士被选中参加骑士战争：在镜世界互相厮杀，最后的胜者可以实现任何愿望。记者城户真司成为龙骑，但他拒绝战斗，试图阻止这场残酷的生存游戏。',
+        keyItems:'空白契约卡, 镜世界入口碎片, 骑士卡组(未完成)',
         keywords:['镜世界','生存游戏','13骑士','契约兽','不战斗就无法生存'], powerLevel:'中高（镜世界战斗，生存形态强化）', locations:'镜世界、ORE新闻社、花鸡餐厅、东京', jp:{ series:'仮面ライダー龍騎 (Kamen Rider Ryuki 假面骑士龙骑)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダー龍騎(城戸真司)、仮面ライダーナイト(秋山蓮)、仮面ライダーゾルダ(北岡秀一)、仮面ライダー王蛇(浅倉威)、仮面ライダーオーディン(神崎士郎)', belt:'Vバックル (V-Buckle V带扣卡组)', finishers:'ドラゴンライダーキック (Dragon Rider Kick 龙骑士踢)、ファイナルベント (Final Vent 最终降临)', villains:'ミラーモンスター (Mirror Monster 镜怪物)、神崎士郎 (Kanzaki Shirō 骑士战争策划者)', vehicles:'ライドシューター (Ride Shooter)', catchphrase:'戦わなければ生き残れない！(Tatakawanakereba Ikinokorenai! 不战斗就无法生存！)' } },
       { id:'555', year:'2003', name:'假面骑士555', sub:'Faiz·手机变身', hero:'乾巧 / 草加雅人 / 三原修二', villain:'奥尔菲诺',
         allRiders:'假面骑士Faiz(乾巧)、假面骑士Kaixa(草加雅人)、假面骑士Delta(三原修二/北崎等)、假面骑士Psyga(Leo)、假面骑士Orga(木场勇治)',
@@ -1543,6 +1563,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'园田真理: 少女，Smart Brain社长的养女，将Faiz腰带托付给乾巧。木场勇治: 马Orphnoch，乾巧的朋友，试图寻求人类与Orphnoch的和平。海堂直也: 蛇Orphnoch，后来成为乾巧的同伴。',
         worldSetting:'舞台为2003年的日本。奥尔菲诺是人类的进化形态，但大多数奥尔菲诺在觉醒后短期内就会死亡。Smart Brain公司表面是IT企业，实为奥尔菲诺统治人类的组织。Faiz系统是Smart Brain开发的骑士装备，通过手机输入变身代码变身为骑士。Faiz的加速形态可以在10秒内以超高速移动，爆裂形态是最强形态。本作探讨了"何为人类"的哲学主题——乾巧作为奥尔菲诺却保护人类，木场勇治作为奥尔菲诺却向往和平。',
         desc:'人类进化的下一阶段——奥尔菲诺。他们在暗中扩张势力，而Faiz腰带是唯一能对抗他们的武器。流浪青年乾巧偶然成为Faiz，他既是人类也是奥尔菲诺，在两者之间挣扎。',
+        keyItems:'Faiz手机, 奥菲以诺之王的血液样本, 流星塾徽章',
         keywords:['奥尔菲诺','手机变身','Faiz','加速形态','爆裂形态'], powerLevel:'中高（加速形态，爆裂形态光子炮）', locations:'流星塾、Smart Brain公司、菊池洗衣店、东京', jp:{ series:'仮面ライダー555（ファイズ）(Kamen Rider 555/Faiz 假面骑士555)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーファイズ(乾巧)、仮面ライダーカイザ(草加雅人)、仮面ライダーデルタ(三原修二)、仮面ライダーサイガ(Leo)、仮面ライダーオーガ(木場勇治)', belt:'ファイズドライバー (Faiz Driver Faiz驱动器)+ファイズフォン (Faiz Phone Faiz手机)', finishers:'クリムゾンスマッシュ (Crimson Smash 绯红电钻)、ブラスタークリムゾンスマッシュ (Blaster Crimson Smash 强化绯红电钻)、アクセルキック (Accel Kick 加速踢)', villains:'オルフェノク (Orphnoch 奥尔菲诺)、スマートブレイン社 (Smart Brain 公司)、花形社長(山羊Orphnoch)、村上峡児(玫瑰Orphnoch)、北崎(龙Orphnoch)', vehicles:'オートバジン (Auto Vajin 自动马人)、ジェットスライガー (Jet Sliger 机动天马号)', catchphrase:'夢は…ありますか？(Yume wa... Arimasu ka? 你有…梦想吗？)', codes:'変身コード: 5-5-5 (Faiz)、9-1-3 (Kaixa)、3-3-3 (Delta)' } },
       { id:'blade', year:'2004', name:'假面骑士剑', sub:'不死者封印', hero:'剑崎一真 / 橘朔也 / 上城睦月', villain:'不死者',
         allRiders:'假面骑士Blade(剑崎一真)、假面骑士Garren(橘朔也)、假面骑士Chalice(相川始)、假面骑士Leangle(上城睦月)',
@@ -1558,6 +1579,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'广濑栞: BOARD的成员，负责支援骑士战斗。白井虎太郎: 剑崎的朋友，提供后勤支援。栗原天音: 少女，相川始寄住的家庭的孩子。',
         worldSetting:'舞台为2004年的日本。一万年前的极限之战中，53只不死者互相战斗，最后的胜者决定世界的命运。人类是由上一次极限之战获胜者创造的。骑士们通过"觉醒卡片"使用不死者的力量，每张卡片代表一种能力。四花色对应四位骑士。Blade的King Form是使用13张黑桃卡片的终极形态，但使用过度会使人变为不死者。本作的核心主题是"牺牲"——剑崎一真为了保护世界，选择放弃人类身份。',
         desc:'一万年前的不死者之战在现代重演。剑崎一真等四人成为假面骑士，使用卡片封印不死者。但最终，为了保护所有人，剑崎做出了牺牲自己成为不死者的选择。',
+        keyItems:'封印之剑(Blay Buckle), 不死兽卡牌, BOARD研究资料',
         keywords:['不死者','卡片封印','BOARD','Joker','King Form'], powerLevel:'高（君王形态融合13只不死兽之力）', locations:'BOARD研究所、人类基盘研究所、蓝花楹餐厅、天文学研究所', jp:{ series:'仮面ライダー剣（ブレイド）(Kamen Rider Blade 假面骑士剑)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーブレイド(剣崎一真)、仮面ライダーギャレン(橘朔也)、仮面ライダーカリス(相川始)、仮面ライダーレンゲル(上城睦月)', belt:'ブレイバックル (Blay Buckle Blay带扣)', finishers:'ライトニングスラッシュ (Lightning Slash 闪电斩)、ロイヤルストレートフラッシュ (Royal Straight Flush 皇家铁碎)', villains:'アンデッド (Undead 不死者)、ジョーカー (Joker 相川始)、天王路博史 (反派人类)', vehicles:'ブルースペイダー (Blue Spader 蓝隼号)', catchphrase:'運命を切り裂け！(Unmei wo Kirisake! 斩断命运！)', suits:'♠スペード(Blade)、♦ダイヤ(Garren)、♥ハート(Chalice)、♣クラブ(Leangle)' } },
       { id:'hibiki', year:'2005', name:'假面骑士响鬼', sub:'鬼与音击', hero:'响鬼 / 威吹鬼 / 轰鬼', villain:'魔化魍',
         allRiders:'假面骑士响鬼(日高仁志)、假面骑士威吹鬼(和泉伊织)、假面骑士轰鬼(户田山登巳藏)、假面骑士斩鬼、假面骑士弹鬼、假面骑士锐鬼等',
@@ -1573,6 +1595,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'安达明日梦: 少年，偶然遇到响鬼后开始了解鬼之战士的世界，是观众的视角。立花日菜佳: 响鬼的助手，负责情报收集和后勤。持田瞳: 医生，响鬼的恋人。',
         worldSetting:'舞台为2005年的日本。本作以日本传统"鬼"文化为题材，完全跳出改造人框架。鬼之战士不是改造人，而是通过修炼获得力量的战士。他们使用"音击"——通过乐器产生的音波攻击来消灭魔化魍。魔化魍是自然界的负面能量产物，需要在特定季节和地点才能诞生。本作强调"修炼"和"传承"的主题，师徒关系是重要元素。响鬼是系列中风格最独特的作品之一，充满了和风美学。',
         desc:'以日本传统"鬼"文化为题材。响鬼等"鬼"使用太鼓等乐器产生的"音击"来消灭魔化魍。他们不是改造人，而是通过修炼获得力量的"鬼"之战士。',
+        keyItems:'变身音叉, 鬼石, 猛士组织徽章',
         keywords:['太鼓','音击','鬼','魔化魍','修炼'], powerLevel:'中（音击战士，以音波之力战斗）', locations:'猛士组织本部、吉野山、立花家、各鬼的修炼地', jp:{ series:'仮面ライダー響鬼 (Kamen Rider Hibiki 假面骑士响鬼)', henshin:'変身！(Henshin! 变身！) （使用音叉敲击）', riders:'仮面ライダー響鬼(日高仁志)、仮面ライダー威吹鬼(和泉伊織)、仮面ライダー轟鬼(戸田山登巳蔵)', belt:'変身音叉・音角 (Onkaku 变身音叉)', finishers:'音撃打・火炎鼓の型 (Ongekida·Kaen-ko no Kata 音击打·火炎鼓之型)、音撃打・爆裂強打の型 (Bakuretsu Kyōda no Kata 爆裂强打之型)', villains:'魔化魍 (Makamō 魔化魍)、童子と姫 (Dōji to Hime 童子与姬)', vehicles:'竜神号 (Ryūjin-gō 龙神号)', catchphrase:'鬼になる！(Oni ni Naru! 成为鬼！)' } },
       { id:'kabuto', year:'2006', name:'假面骑士Kabuto', sub:'加速世界', hero:'天道总司 / 加贺美新', villain:'Worm',
         allRiders:'假面骑士Kabuto(天道总司)、假面骑士Gatack(加贺美新)、假面骑士TheBee(矢车想/影山瞬)、假面骑士Drake(风间大介)、假面骑士Sasword(神代剑)、假面骑士Dark Kabuto(天道总司·拟态)、假面骑士KickHopper(矢车想)、假面骑士PunchHopper(影山瞬)',
@@ -1588,6 +1611,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'日下部日和: 女主角，天道的青梅竹马，实际上也是Worm的拟态。天道树花: 天道的妹妹，天道的软肋。岬佑月: ZECT的美女特工，加贺美的上司。',
         worldSetting:'舞台为2006年的日本。Worm是来自宇宙的拟态生物，七年前随陨石来到地球。ZECT组织开发了Masked Rider系统对抗Worm。Clock Up是骑士系统的核心能力，可以在超加速时间中战斗。Kabuto的设计以独角仙为主题，融入"甲虫"的造型元素。天道总司的"奶奶说过"是贯穿全剧的经典台词。本作以"完美超人"天道总司为中心，展现了他从孤独到拥有伙伴的成长。',
         desc:'陨石坠落带来了拟态人类的宇宙生物Worm。天道总司自称"行天之道、总司一切的男人"，化身为Kabuto在Clock Up加速时间中战斗。',
+        keyItems:'骑士腰带(未启动), ZECT昆虫仪, 天道总司的料理笔记',
         keywords:['Clock Up','Worm','ZECT','Hyper形态','奶奶说过'], powerLevel:'极高（Hyper形态超光速移动，可穿越时空）', locations:'ZECT基地、天之道洋食店Bistro La Salle、涩谷废墟、Area X', jp:{ series:'仮面ライダーカブト (Kamen Rider Kabuto 假面骑士Kabuto)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーカブト(天道総司)、仮面ライダーガタック(加賀美新)、仮面ライダーザビー(矢車想/影山瞬)、仮面ライダードレイク(風間大介)、仮面ライダーサソード(神代剣)', belt:'カブトゼクター (Kabuto Zecter 独角仙变身器)+ライダーベルト (Rider Belt 骑士腰带)', finishers:'ライダーキック (Rider Kick 骑士踢)、ハイパーライダーキック (Hyper Rider Kick)、マキシマムハイパーキック (Maximum Hyper Kick)', villains:'ワーム (Worm 异虫)、ゼクト (ZECT)、ネイティブ (Native 原虫)', vehicles:'カブトエクステンダー (Kabuto Extender)', catchphrase:'おばあちゃんが言っていた…天の道を行き、総てを司る男！(Obāchan ga Itteita... Ten no Michi wo Yuki, Subete wo Tsukasadoru Otoko! 奶奶说过…行天之道、总司一切的男人！)', clockUp:'クロックアップ！(Clock Up! 加速！)' } },
       { id:'deno', year:'2007', name:'假面骑士电王', sub:'时之列车', hero:'野上良太郎 / 桃塔罗斯等', villain:'异魔神',
         allRiders:'假面骑士电王(野上良太郎)、假面骑士Zeronos(樱井侑斗)、假面骑士新电王(野上幸太郎)',
@@ -1603,6 +1627,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'叶奈: 来自未来的时间守护者，使用"时间之砂"追踪异魔神。车长: 电班列的车长，掌控时间列车的运行。直美: 电班列的乘务员，提供咖啡和后勤。樱井侑斗: 良太郎姐姐的未婚夫，Zeronos的变身者。',
         worldSetting:'舞台为2007年的日本。异魔神来自未来，通过与人类签订契约回到过去破坏时间线。电班列(DenLiner)是穿梭于时间线的列车，穿越不同时间点。电王的变身方式独特——异魔神附身后，良太郎的身体会变成对应形态。每个异魔神有自己的性格和战斗风格。本作以"时间"和"记忆"为核心主题，Zeronos的设定尤为悲壮——每次变身都消耗他人对他的记忆，最终可能被所有人遗忘。电王是平成骑士中人气最高的作品之一。',
         desc:'最弱的骑士——良太郎被异魔神附身，却因此获得了变身电王的能力。他与桃塔罗斯等四位异魔神共用身体，乘坐时之列车电班列在不同时间线战斗。',
+        keyItems:'异魔神车票, 电王腰带, 时之列车模型',
         keywords:['时间旅行','异魔神','电班列','附身','良太郎'], powerLevel:'高（时间列车穿越时空，电车斩）', locations:'电王列车·时之沙漠、Milk Dipper咖啡店、零诺斯列车', jp:{ series:'仮面ライダー電王 (Kamen Rider Den-O 假面骑士电王)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダー電王(野上良太郎)、仮面ライダーゼロノス(桜井侑斗)', belt:'デンオウベルト (Den-O Belt 电王腰带)', finishers:'俺の必殺技！(Ore no Hissatsu-waza! 我的必杀技！)、電車斬り (Densha Giri 电车斩)、クライマックスキック (Climax Kick 高潮踢)', villains:'イマジン (Imagin 异魔神)、カイ (Kai 凯)', vehicles:'デンライナー (DenLiner 电班列)', catchphrase:'いーじゃん！いーじゃん！スゲーじゃん！(Ī-jan! Ī-jan! Sugē-jan! 不错吧！不错吧！超棒吧！)', taros:'モモタロス(桃塔罗斯/红色)、ウラタロス(浦塔罗斯/蓝色)、キンタロス(金塔罗斯/金色)、リュウタロス(龙塔罗斯/紫色)' } },
       { id:'kiva', year:'2008', name:'假面骑士Kiva', sub:'吸血鬼骑士', hero:'红渡 / 红音也', villain:'Fangire',
         allRiders:'假面骑士Kiva(红渡)、假面骑士Ixa(名护启介/红音也)、假面骑士Saga(登太牙)、假面骑士Rey(白峰天斗)、假面骑士Arc(杉村隆)',
@@ -1618,6 +1643,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'麻生惠: 2008年的女战士，继承了母亲的意志对抗Fangire。麻生百合: 1986年的女战士，麻生惠的母亲，红音也的恋人。野村静香: 红渡的朋友，帮助他克服社交恐惧。次狼: 狼人怪人，Kiva的盟友。拉蒙: 半鱼人怪人，Kiva的盟友。力: 科学怪人，Kiva的盟友。',
         worldSetting:'舞台为1986年和2008年两条时间线的日本。Fangire是类似吸血鬼的种族，以人类生命能量为食。Kiva的变身系统使用Kivat-bat III世（蝙蝠）作为变身器，通过吸收Fangire的力量来变换形态。魔皇形态(Emperor Form)是Kiva的最强形态。Ixa是人类开发的对抗Fangire的骑士系统。本作以"双时间线"叙事为特色，1986年的故事与2008年的故事相互交织，最终揭示真相。音乐（小提琴）是贯穿全剧的重要元素。',
         desc:'两条时间线并行：1986年红音也的故事与2008年其子红渡的故事。红渡患有社交恐惧症，却继承了Kiva的力量，对抗吸食人类生命能量的Fangire族。',
+        keyItems:'Kivat蝙蝠族徽章, 魔皇力注入器, 梵佳亚族谱',
         keywords:['吸血鬼','Fangire','双时间线','小提琴','魔皇'], powerLevel:'高（魔皇形态，德伽封印之力）', locations:'德兰城、美好蓝天会、咖啡店·马耳他、梵牙亚之森', jp:{ series:'仮面ライダーキバ (Kamen Rider Kiva 假面骑士Kiva)', henshin:'変身！(Henshin! 变身！) （キバットが噛む）', riders:'仮面ライダーキバ(紅渡)、仮面ライダーイクサ(名護啓介/紅音也)、仮面ライダーサガ(登太牙)', belt:'キバットバットIII世 (Kivat-bat III世 蝙蝠变身器)', finishers:'ダークネスムーンブレイク (Darkness Moon Break 暗月破)、エンペラームーンブレイク (Emperor Moon Break 魔皇月破)、ガルルバイト (Garulu Bite 加鲁鲁咬击)', villains:'ファンガイア (Fangire 牙血鬼)、チェックメイトフォー (Checkmate Four 象棋四干部)、キング (King 王)、クイーン (Queen 女王)、ビショップ (Bishop 主教)、ルーク (Rook 战车)', vehicles:'マシンキバー (Machine Kivaa 机械基瓦龙)', catchphrase:'キバっていくぜ！(Kiba tte Iku ze! 上吧Kiva！)' } },
       { id:'decade', year:'2009', name:'假面骑士Decade', sub:'世界的破坏者', hero:'门矢士', villain:'大修卡',
         allRiders:'假面骑士Decade(门矢士)、假面骑士Diend(海东大树)、假面骑士Kivala(光夏海)',
@@ -1633,6 +1659,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'光夏海: 光写真馆的摄影师，Decade的伙伴，一直支持门矢士的旅程。光荣次郎: 光写真馆的馆长，神秘老人。海东大树: Diend的变身者，宝物猎人，追寻"究极的宝物"。',
         worldSetting:'舞台为2009年的多个平行世界。每个平行世界都是一个独立的骑士世界，但与原作设定有所不同。Decade驱动器可以装载骑士卡片，让门矢士变身为任何平成骑士并使用其能力。完全形态(Complete Form)可以将九位骑士的力量合为一体。本作是平成骑士十周年的纪念作品，串联了所有平成骑士的世界观。主题是"旅途"——门矢士的旅程既是寻找自我的过程，也是连接所有骑士世界的纽带。',
         desc:'门矢士是"世界的破坏者"，穿越九个平行骑士世界。他能变身为任何骑士，使用最终形态驾驭卡。他的旅途将决定所有世界的存亡。',
+        keyItems:'极光帷幕碎片, 骑士卡片(空白), 夏海的海报',
         keywords:['平行世界','九大世界','骑士卡片','大修卡','品红'], powerLevel:'极高（完全形态可召唤全骑士，世界破坏者）', locations:'光照相馆、九大平行世界、各骑士世界', jp:{ series:'仮面ライダーディケイド (Kamen Rider Decade 假面骑士Decade)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーディケイド(門矢士)、仮面ライダーディエンド(海東大樹)、仮面ライダーキバーラ(光夏海)', belt:'ディケイドライバー (Decadriver Decade驱动器)', finishers:'ディメンションキック (Dimension Kick 次元踢)、ファイナルアタックライド (Final Attack Ride 最终攻击驾驭)、強化ディメンションキック (强化次元踢)', villains:'大ショッカー (Dai-Shocker 大修卡)、鳴滝 (Narutaki 鸣泷)、アポロガイスト (Apollo Geist)', vehicles:'ディケイダー (Decader 十年号)', catchphrase:'通りすがりの仮面ライダーだ！覚えておけ！(Tōrisugari no Kamen Rider da! Oboeteoke! 我只是路过的假面骑士！给我记住了！)', cards:'カメンライド (Kamen Ride 假面驾驭)、ファイナルフォームライド (Final Form Ride 最终形态驾驭)、コンプリートフォーム (Complete Form 完全形态)' } }
     ]
   },
@@ -1654,6 +1681,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'鸣海亚树子: 鸣海庄吉的女儿，事务所所长，活力四射。园咲若菜: 电台DJ"治愈公主"，菲利普的姐姐，最终与翔太郎并肩作战。Queen&Elizabeth: 风都的偶像组合，提供情报。',
         worldSetting:'舞台为风都——一个虚构的日本城市，以风车和风力发电为特色。盖亚记忆体是博物馆开发的技术，通过插入人体产生Dopant。W的变身方式独特：两人通过"双重驱动器"合体，翔太郎的身体和菲利普的灵魂共同构成W。极限形态(Extreme)是W的最强形态，通过Xtreme记忆体实现二人完全同步。本作是平成骑士系列中首次以侦探题材为主的作品，融合了硬汉侦探和伙伴组合的元素。',
         desc:'风都侦探，左翔太郎与菲利普二人一体变身为假面骑士W。使用盖亚记忆体，通过不同组合切换形态。风都的谜团、菲利普的身世、博物馆的阴谋，在疾风与王牌中揭开。',
+        keyItems:'盖亚记忆体(空白), 风都塔模型, 鸣海侦探事务所名片',
         keywords:['二人一体','盖亚记忆体','风都','侦探','博物馆'], powerLevel:'中高（极致形态，地球记忆之力）', locations:'风都塔、鸣海侦探事务所、风都博物馆、园咲邸', jp:{ series:'仮面ライダーW（ダブル）(Kamen Rider W 假面骑士W)', henshin:'変身！(Henshin! 变身！) 翔太郎+フィリップ、二人で一人の探偵！', riders:'仮面ライダーW(左翔太郎&フィリップ)、仮面ライダーアクセル(照井竜)、仮面ライダースカル(鳴海荘吉)、仮面ライダーエターナル(大道克己)', belt:'ダブルドライバー (Double Driver 双重驱动器)+ガイアメモリ (Gaia Memory 盖亚记忆体)', finishers:'ジョーカーエクストリーム (Joker Extreme 王牌极限踢)、ダブルエクストリーム (Double Extreme 双重极限)、ゴールデンエクストリーム (Golden Extreme 黄金极限踢)', villains:'ミュージアム (Museum 博物馆)、園咲琉兵衛(テラードーパント)、園咲冴子(タブードーパント)、園咲若菜(クレイドールドーパント)', vehicles:'ハードボイルダー (HardBoilder 硬汉号)', catchphrase:'さあ、お前の罪を数えろ！(Sā, Omae no Tsumi wo Kazoero! 来吧，细数你的罪恶吧！)', forms:'サイクロンジョーカー (疾风王牌)、ヒートメタル (炙热钢铁)、ルナトリガー (月神扳机)、ファングジョーカー (獠牙王牌)、エクストリーム (极限)' } },
       { id:'ooo', year:'2010', name:'假面骑士OOO', sub:'欲望与硬币', hero:'火野映司 / Ankh', villain:'Greeed',
         allRiders:'假面骑士OOO(火野映司)、假面骑士Birth(伊达明/后藤慎太郎)、假面骑士Birth·Day、假面骑士Poseidon',
@@ -1669,6 +1697,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'泉比奈: 映司的朋友，拥有怪力，帮助映司。白石千世子: 多国料理店"知世子"的店主，映司的庇护者。Ankh: 鸟类Greeed，映司的搭档，逐渐理解人类的感情。',
         worldSetting:'舞台为2010年的日本。800年前，炼金术士创造了人造生命体Greeed，他们由核心硬币构成，每个Greeed缺少一枚核心硬币。OOO驱动器使用三枚核心硬币变身，不同组合产生不同联组。核心硬币代表不同的欲望：鹰=自我、虎=力量、蝗=跳跃等。恐龙联组是映司内心黑暗面的体现。本作的主题是"欲望"——人类的欲望是罪恶的根源，也是前进的动力。',
         desc:'800年前被封印的Greeed在现代苏醒。流浪者火野映司与Greeed的Ankh联手，使用核心硬币变身为OOO，通过不同硬币组合切换形态。他的欲望是"没有欲望"。',
+        keyItems:'普通硬币, Ankh的羽毛, 鸿上基金会徽章',
         keywords:['核心硬币','Greeed','欲望','Ankh','联组'], powerLevel:'高（恐龙联组可毁灭一切，欲望之力）', locations:'鸿上基金会、多国料理店Cous Coussier、梦中公园、美术馆', jp:{ series:'仮面ライダーOOO（オーズ）(Kamen Rider OOO 假面骑士OOO)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーオーズ(火野映司)、仮面ライダーバース(伊達明/後藤慎太郎)', belt:'オーズドライバー (OOO Driver)+コアメダル (Core Medal 核心硬币)', finishers:'オーズバッシュ (OOO Bash 骑士踢)、各コンボ必殺技 (各联组必杀)', villains:'グリード (Greeed 欲望使徒)、ウヴァ(Uva/昆虫)、カザリ(Kazari/猫科)、ガメル(Gamel/重量)、メズール(Mezool/水栖)、アンク(Ankh/鸟类)', vehicles:'ライドベンダー (Ride Vendor 蝗虫摩托车)', catchphrase:'欲望は…俺の力だ！(Yokubō wa... Ore no Chikara da! 欲望…是我的力量！)', combos:'タトバ (鹰虎蝗)、ガタキリバ (锹螳蝗)、ラトラーター (狮虎豹)、サゴーゾ (犀猩象)、タジャドル (翼角暴)、シャウタ (虎鲸电鳗)、プトティラ (恐龙)' } },
       { id:'fourze', year:'2011', name:'假面骑士Fourze', sub:'青春校园', hero:'如月弦太郎', villain:'Zodiarts',
         allRiders:'假面骑士Fourze(如月弦太郎)、假面骑士Meteor(朔田流星)、假面骑士Nadeshiko(美咲抚子)',
@@ -1684,6 +1713,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'歌星贤吾: 转校生，弦太郎的搭档，拥有操控宇宙开关的能力。城岛悠木: 啦啦队队长，假面骑士部成员。风城美羽: 学生会长，最初高傲但后来成为伙伴。大文字隼: 美式足球部队长，假面骑士部成员。JK: 情报通，假面骑士部成员。',
         worldSetting:'舞台为天高高中（天之川高中），以校园为背景。Fourze使用40个Astro Switch（宇宙开关），每个开关代表一种功能（火箭、钻头、雷达等）。宇宙状态(Cosmic States)是融合所有开关力量的最强形态。本作以"青春"和"友情"为主题，纪念假面骑士系列40周年，也是人类首次载人航天飞行50周年。校园题材让骑士系列更加贴近年轻观众，如月弦太郎的"宇宙来了——！"是经典台词。',
         desc:'天高高中，如月弦太郎化身为假面骑士Fourze。他使用40个Astro Switch，以火箭和钻头为武器，与全校同学成为朋友，对抗Zodiarts的威胁。',
+        keyItems:'宇宙开关(未激活), 天高高中校徽, 假面骑士部部旗',
         keywords:['宇宙','校园','Switch','友情','火箭'], powerLevel:'中高（宇宙形态，友情之力）', locations:'天高高中、月球基地、宇宙空间站M-BUS、兔子窝', jp:{ series:'仮面ライダーフォーゼ (Kamen Rider Fourze 假面骑士Fourze)', henshin:'変身！(Henshin! 变身！) 3・2・1！', riders:'仮面ライダーフォーゼ(如月弦太朗)、仮面ライダーメテオ(朔田流星)、仮面ライダーなでしこ(美咲撫子)', belt:'フォーゼドライバー (Fourze Driver)+アストロスイッチ (Astro Switch 宇宙开关)', finishers:'ライダーロケットドリルキック (Rider Rocket Drill Kick 火箭钻头踢)、コズミックキック (Cosmic Kick 宇宙踢)', villains:'ゾディアーツ (Zodiarts 宙体暗使)、ホロスコープス (Horoscopes 十二宫)、我望光明(サジタリウス)', vehicles:'マシンマッシグラー (Machine Massigler)', catchphrase:'宇宙キター！(Uchū Kitā! 宇宙来了—！)', switches:'ロケット (火箭)、ドリル (钻头)、レーダー (雷达)' } },
       { id:'wizard', year:'2012', name:'假面骑士Wizard', sub:'魔法戒指', hero:'操真晴人', villain:'Phantom',
         allRiders:'假面骑士Wizard(操真晴人)、假面骑士Beast(仁藤攻介)、假面骑士Mage(多名)、假面骑士Wiseman(白魔)',
@@ -1699,6 +1729,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'历: 少女，Phantom的核心，晴人保护的对象。大门凛子: 警视厅警官，晴人的盟友。轮岛繁: 戒指工匠，为晴人制作魔法戒指。笛木奏: Wiseman的真身，为复活女儿历而不择手段。',
         worldSetting:'舞台为2012年的日本。日蚀之日是Phantom诞生的契机，绝望之人被Phantom吞噬后变成怪物。Wizard的魔法来源于魔法戒指，每枚戒指代表一种魔法。四大元素是Wizard的核心力量，无限风格(Infinity)是最强形态。Beast的魔力来源于古代魔法师，需要吞噬Phantom的魔力维持生命。本作的主题是"希望"——在绝望中保持希望，就能成为魔法师。',
         desc:'日蚀之日，绝望之人会被Phantom吞噬。操真晴人在绝望中保住了希望，成为魔法师Wizard。使用魔法戒指施展四大元素魔法，守护人类的希望。',
+        keyItems:'魔法戒指(空白), 魔龙之泪, 古魔法书残页',
         keywords:['魔法','戒指','Phantom','元素','希望'], powerLevel:'高（无限形态，魔法全开）', locations:'面影堂古董店、魔法师之塔、鸟井坂、东京', jp:{ series:'仮面ライダーウィザード (Kamen Rider Wizard 假面骑士Wizard)', henshin:'変身！(Henshin! 变身！) プリーズ！(Please!)', riders:'仮面ライダーウィザード(操真晴人)、仮面ライダービースト(仁藤攻介)、仮面ライダーメイジ(多名)', belt:'ウィザードライバー (Wizardriver)+ウィザードリング (Wizard Ring 魔法戒指)', finishers:'ストライクウィザード (Strike Wizard 强袭踢)、ドラゴンキック (Dragon Kick 魔龙踢)、インフィニティキック (Infinity Kick 无限踢)', villains:'ファントム (Phantom 魅影)、ワイズマン/白魔 (Wiseman/笛木奏)、メデューサ (Medusa)、フェニックス (Phoenix)、グレムリン (Gremlin)', vehicles:'マシンウィンガー (Machine Winger 机器翼龙)', catchphrase:'希望…それが俺の魔法だ！(Kibō... Sore ga Ore no Mahō da! 希望…这就是我的魔法！)', elements:'フレイム (火焰)、ハリケーン (飓风)、ウォーター (流水)、ランド (大地)' } },
       { id:'gaim', year:'2013', name:'假面骑士铠武', sub:'水果武者', hero:'葛叶纮汰', villain:'海姆冥界',
         allRiders:'假面骑士铠武(葛叶纮汰)、假面骑士巴隆(驱纹戒斗)、假面骑士龙玄(吴岛光实)、假面骑士斩月(吴岛贵虎)、假面骑士玛莉卡(凑耀子)、假面骑士古列顿(城乃内秀保)、假面骑士布拉弗(凰莲·皮埃尔·阿方索)、假面骑士Duke(战极凌马)、假面骑士邪武(光金)等',
@@ -1714,6 +1745,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'高司舞: 纮汰的青梅竹马，命运之巫女，拥有感知海姆冥界的能力。吴岛贵虎: 斩月，光实的哥哥，背负着保护世界的责任。驱纹戒斗: 巴隆，纮汰的竞争对手，最后的盟友。',
         worldSetting:'舞台为泽芽市。世界树财团(Yggdrasil Corporation)是掌控泽芽市的大企业，暗中研究海姆冥界的秘密。海姆冥界是异世界的森林，拥有将一切生命转化为Inves的力量。定锁种子是海姆冥界的果实所化，通过战极驱动器变身。胜吼武装和极武装(大将军)是铠武的最强形态。本作由虚渊玄担任编剧，以"水果"和"武士"为主题，融合了街舞文化、战国武将和黑暗奇幻元素。主题是"成长"——从游戏到责任，从少年到神。',
         desc:'来自异世界的果实带来了变身能力，也带来了毁灭。街舞少年葛叶纮汰成为铠武，在力量与责任之间成长。最终，他成为了神，也成为了新的开始。',
+        keyItems:'战极驱动器核心, 赫尔海姆果实种子, 甲斗·凌马的笔记本',
         keywords:['水果','战极驱动器','海姆冥界','神','街舞'], powerLevel:'创世级（始源之男，黄金果实可创造/毁灭世界）', locations:'泽芽市、海姆冥界森林、舞团车库、世界树之塔', jp:{ series:'仮面ライダー鎧武（ガイム）(Kamen Rider Gaim 假面骑士铠武)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダー鎧武(葛葉紘汰)、仮面ライダーバロン(駆紋戒斗)、仮面ライダー龍玄(呉島光実)、仮面ライダー斬月(呉島貴虎)', belt:'戦極ドライバー (Sengoku Driver 战极驱动器)+ロックシード (Lock Seed 定锁种子)', finishers:'ブライキック (Burai Kick 无赖踢)、カチドキキック (Kachidoki Kick 胜哄踢)、フルーツバスケット (Fruits Basket 水果斩)', villains:'ヘルヘイム (Helheim 海姆冥界)、DJサガラ (DJ相乐/蛇)、ロシュオ (Roshuo Overlord之王)、レデュエ (Redyue 狡猾的Overlord)', vehicles:'サクラハリケーン (Sakura Hurricane 樱花飓风号)', catchphrase:'ここからは…俺のステージだ！(Koko kara wa... Ore no Stage da! 接下来…是我的舞台！)', arms:'オレンジアームズ (柳橙武装)、カチドキアームズ (胜吼武装)、極アームズ (极武装/大将军)' } },
       { id:'drive', year:'2014', name:'假面骑士Drive', sub:'刑警骑士', hero:'泊进之介', villain:'Roidmude',
         allRiders:'假面骑士Drive(泊进之介)、假面骑士Mach(诗岛刚)、假面骑士Chaser(追猎/Chase)、假面骑士Dark Drive(泊英志/未来)',
@@ -1729,6 +1761,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'腰带先生/Belt-san(声优: 克里斯·帕普勒): 克里姆博士的意识，Drive的搭档，存储于腰带中。诗岛雾子: 特状课女警，进之介的搭档，后来成为恋人。追猎/Chase: Roidmude 000号，从敌人变为盟友，最终为保护人类牺牲。',
         worldSetting:'舞台为2014年的日本。Roidmude是蛮野天十郎创造的108个AI生命体，拥有"重加速"能力，可以减慢周围时间。Drive使用Shift Car（小型变形汽车）作为力量来源，特莱多隆是Drive的专用车辆。本作以"刑警"和"汽车"为主题，Drive的形态变化对应不同的汽车类型。核心主题是"人与AI的共存"——Roidmude是否有生存的权利？人类与AI能否和平共处？',
         desc:'刑警泊进之介与搭档腰带先生一起，驾驶特莱多隆追查Roidmude犯罪。108个Roidmude拥有"重加速"能力，能减慢时间。真相是人与AI的共存之路。',
+        keyItems:'移速小车(未激活), 警视厅特殊科徽章, 库里姆·斯坦贝尔特的芯片',
         keywords:['刑警','汽车','Roidmude','重加速','腰带先生'], powerLevel:'高（方程式形态，超加速对抗）', locations:'特状课办公室、久瑠间驾驶执照考场、克里姆的实验室、东京', jp:{ series:'仮面ライダードライブ (Kamen Rider Drive 假面骑士Drive)', henshin:'変身！(Henshin! 变身！) スタート・ユア・エンジン！(Start Your Engine!)', riders:'仮面ライダードライブ(泊進ノ介)、仮面ライダーマッハ(詩島剛)、仮面ライダーチェイサー(追跡/Chase)', belt:'ドライブドライバー (Drive Driver)+シフトブレス (Shift Brace 移速手环)', finishers:'スピードロップ (Speedrop 全速踢)、フォーミュラキック (Formula Kick 方程式踢)、トライドロンキック (Tridoron Kick 超死火踢)', villains:'ロイミュード (Roidmude 恶路程式)、ハート(Heart/002)、ブレン(Brain/003)、メディック(Medic/009)、蛮野天十郎(004/ゴルドドライブ)', vehicles:'トライドロン (Tridoron 特莱多隆)', catchphrase:'ひとっ走り付き合えよ！(Hitoppashiri Tsukiae yo! 陪我跑一圈吧！)', shiftCars:'シフトカー (Shift Car 移速小车)' } },
       { id:'ghost', year:'2015', name:'假面骑士Ghost', sub:'眼魂骑士', hero:'天空寺尊', villain:'眼魔',
         allRiders:'假面骑士Ghost(天空寺尊)、假面骑士Specter(深海诚)、假面骑士Necrom(亚兰)',
@@ -1744,6 +1777,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'月村明里: 尊的青梅竹马，科学家，帮助研究眼魂。御成: 寺院住持，尊的伙伴。深海花音: 诚的妹妹，因眼魂的力量沉睡。',
         worldSetting:'舞台为2015年的日本。眼魔世界是一个与人类世界平行的异空间，眼魔通过收集人类灵魂来维持运转。Ghost使用眼魂(Eyecon)变身，每个眼魂代表一位历史伟人。伟人的力量赋予Ghost不同的战斗风格。眼魂驱动器是变身的关键。尊必须在99天内收集15个眼魂，否则将完全消失。本作以"生命"为主题——通过幽灵的视角，探讨生命的价值和意义。',
         desc:'天空寺尊在18岁生日当天被眼魔杀害，却以幽灵之身复活。他必须在99天内集齐15个伟人眼魂才能复活。生命的意义，在幽灵的视角下更加深刻。',
+        keyItems:'幽灵眼魂(空白), 大天空寺的护符, 仙人遗物',
         keywords:['幽灵','眼魂','伟人','99天','复活'], powerLevel:'极高（无限魂，无限进化潜力，可连接伟大之眼）', locations:'大天空寺、眼魔世界、不可思议现象研究所、英雄之村', jp:{ series:'仮面ライダーゴースト (Kamen Rider Ghost 假面骑士Ghost)', henshin:'変身！(Henshin! 变身！) バッチリミナー！(Batchirimina!)', riders:'仮面ライダーゴースト(天空寺タケル)、仮面ライダースペクター(深海マコト)、仮面ライダーネクロム(アラン)', belt:'ゴーストドライバー (Ghost Driver)+眼魂（アイコン）(Eyecon)', finishers:'オメガドライブ (Ore Omega Drive 我魂踢)、ムゲンキック (Mugen Kick 无限魂踢)', villains:'眼魔（ガンマ）(Gamma)、アデル(Adel/阿迪尔)、大帝アドニス(Adonis)、ガンマイザー(Ganmaizer 眼魔使)', vehicles:'マシンゴーストライカー (Machine Ghostriker)', catchphrase:'命、燃やすぜ！(Inochi, Moyasu ze! 燃烧生命吧！)', eyecons:'武蔵 (Musashi 武藏)、エジソン (Edison 爱迪生)、ニュートン (Newton 牛顿)、ムゲン (Mugen 无限)' } },
       { id:'exaid', year:'2016', name:'假面骑士Ex-Aid', sub:'游戏医生', hero:'宝生永梦', villain:'Bugster',
         allRiders:'假面骑士Ex-Aid(宝生永梦)、假面骑士Brave(镜飞彩)、假面骑士Snipe(花家大我)、假面骑士Lazer(九条贵利矢)、假面骑士Genm(檀黎斗)、假面骑士Para-DX(帕拉德)、假面骑士Poppy(波比)、假面骑士Cronus(檀正宗)',
@@ -1759,6 +1793,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'帕拉德: 永梦体内的Bugster，既是敌人也是伙伴。镜飞彩: 天才外科医生，永梦的同事。花家大我: 无证医生，拥有5年临床经验。檀黎斗: 疯狂的天才游戏开发者，创造Bugster的人。',
         worldSetting:'舞台为2016年的日本。游戏病是由Bugster病毒引起的疾病，患者出现游戏化症状。骑士们使用玩家驱动器和骑士卡带变身，每种卡带对应一种游戏类型。Ex-Aid的形态通过"升级"提升等级（Lv.1→Lv.99），无敌玩家(Muteki)是最强形态。Cronus拥有暂停(Pause)和重启(Reset)时间的能力。本作以"游戏"和"医生"为主题，探讨了"游戏能否拯救生命"的问题。',
         desc:'电脑病毒Bugster感染人类，引发游戏病。天才游戏玩家兼儿科医生宝生永梦化身为Ex-Aid，用游戏的力量拯救患者。"患者的命运，由我来改变！"',
+        keyItems:'游戏卡带(空白), 幻梦集团徽章, 檀黎斗的游戏设计稿',
         keywords:['游戏','医生','Bugster','卡带','无敌'], powerLevel:'极高（无敌玩家，无视一切伤害，可改写游戏规则）', locations:'圣都大学附属医院、幻梦公司、CR室、游戏世界', jp:{ series:'仮面ライダーエグゼイド (Kamen Rider Ex-Aid 假面骑士Ex-Aid)', henshin:'変身！(Henshin! 变身！) ガシャット！(Gashat!)', riders:'仮面ライダーエグゼイド(宝生永夢)、仮面ライダーブレイブ(鏡飛彩)、仮面ライダースナイプ(花家大我)、仮面ライダーゲンム(檀黎斗)、仮面ライダーパラドクス(パラド)', belt:'ゲーマドライバー (Gamer Driver 玩家驱动器)+ライダーガシャット (Rider Gashat 骑士卡带)', finishers:'マイティクリティカルストライク (Mighty Critical Strike 骑士踢)、ハイパークリティカルストライク (Hyper Critical Strike 无敌踢)', villains:'バグスター (Bugster 崩源体)、檀黎斗(ゲンム/神)、パラド(Parad)、檀正宗(クロノス)', vehicles:'ゲームバイク (Lazer Motorcycle)', catchphrase:'患者の運命は、俺が変える！(Kanja no Unmei wa, Ore ga Kaeru! 患者的命运，由我来改变！)', gashats:'マイティアクションX (Mighty Action X)、タドルクエスト (Taddle Quest 探索任务)、バンバンシューティング (Bang Bang Shooting)' } },
       { id:'build', year:'2017', name:'假面骑士Build', sub:'物理学家', hero:'桐生战兔 / 万丈龙我', villain:'Evolto',
         allRiders:'假面骑士Build(桐生战兔)、假面骑士Cross-Z(万丈龙我)、假面骑士Grease(猿渡一海)、假面骑士Rogue(冰室幻德)、假面骑士Evol(艾博鲁特/Evolto)、假面骑士MadRogue(内海成彰)',
@@ -1774,6 +1809,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'万丈龙我: 战兔的搭档，Cross-Z的变身者，性格单纯热血。石动美空: 拥有净化满装瓶能力的少女，战兔的助手。泷川纱羽: 记者，调查潘多拉魔盒的秘密。冰室幻德: 东都首相之子，Rogue，最终成为战兔的盟友。',
         worldSetting:'舞台为被潘多拉魔盒分割的日本（东都、西都、北都）。潘多拉魔盒是火星文明的遗产，拥有改变世界的力量。Build使用满装瓶(Full Bottle)变身，最佳搭配是两种不同满装瓶的组合。危险形态是过度使用Evolto基因的形态，天才形态是战兔自己创造的最终形态。本作以"科学"和"战争"为主题，探讨了科技的双刃剑属性和战争的残酷。',
         desc:'火星带回的潘多拉魔盒将日本一分为三。天才物理学家桐生战兔化身为Build，使用满装瓶的实验搭配战斗。然而，一切的真相远比想象中残酷。',
+        keyItems:'潘多拉面板碎片, 满装瓶(空白), 天空之壁碎片',
         keywords:['物理','满装瓶','潘多拉魔盒','Evolto','最佳搭配'], powerLevel:'极高（天才形态，潘多拉魔盒可融合平行世界）', locations:'东都·西都·北都(三都)、天空之壁、咖啡馆Nascita、潘多拉之塔', jp:{ series:'仮面ライダービルド (Kamen Rider Build 假面骑士Build)', henshin:'変身！(Henshin! 变身！) ベストマッチ！(Best Match!)', riders:'仮面ライダービルド(桐生戦兎)、仮面ライダークローズ(万丈龍我)、仮面ライダーグリス(猿渡一海)、仮面ライダーローグ(氷室幻徳)、仮面ライダーエボル(エボルト)', belt:'ビルドドライバー (Build Driver)+フルボトル (Full Bottle 满装瓶)', finishers:'ボルテックフィニッシュ (Vortex Finish 胜利方程式踢)、ジーニアスフィニッシュ (Genius Finish 天才踢)', villains:'エボルト (Evolto 来自宇宙的血族)、ファウスト (Faust 浮士德)、難波重工 (Nanba Heavy Industries)、内海成彰(マッドローグ)', vehicles:'マシンビルダー (Machine Builder 机械创造者)', catchphrase:'勝利の法則は決まった！(Shōri no Hōsoku wa Kimatta! 胜利的法则已经决定了！)', bottles:'ラビットタンク (兔子坦克)、ゴリラモンド (大猩猩钻石)、ホークガトリング (飞鹰加特林)、ジーニアス (天才)' } },
       { id:'zio', year:'2018', name:'假面骑士Zi-O', sub:'时间之王', hero:'常磐庄吾', villain:'时劫者',
         allRiders:'假面骑士Zi-O(常磐庄吾)、假面骑士Geiz(明光院月津)、假面骑士Woz(沃兹)、假面骑士月读(月读)、假面骑士逢魔Zi-O(常磐庄吾/未来)',
@@ -1789,6 +1825,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'明光院月津: Geiz，来自未来的战士，最初的敌人，最终的战友。月读: 来自未来的少女，引导庄吾走向正确的道路。沃兹: 庄吾的预言者和忠臣，书写庄吾成为王的历程。',
         worldSetting:'舞台为2018年的日本，连接2068年的未来。Zi-O使用时空驱动器(Ziku-Driver)和骑士手表(Ridewatch)变身，每个骑士手表代表一位平成骑士的力量。异类骑士(Another Rider)是时劫者创造的扭曲骑士，夺取了原骑士的历史。逢魔Zi-O是最强形态，拥有所有骑士的力量。本作是平成骑士系列的收官之作，串联了20年平成骑士的历史，致敬了所有前辈骑士。',
         desc:'常磐庄吾注定成为最恶的魔王——逢魔Zi-O。但他拒绝命运，选择成为最善的魔王。穿越时间与所有平成骑士相遇，继承他们的力量，改写自己的未来。',
+        keyItems:'时空驱动器碎片, 骑士手表(空白), 逢魔之书残页',
         keywords:['时间','逢魔','骑士手表','时劫者','平成收官'], powerLevel:'创世级（逢魔Zi-O拥有全骑士之力，可创造/毁灭时空）', locations:'九时五时堂钟表店、2068年荒废未来、各传说骑士的时空', jp:{ series:'仮面ライダージオウ (Kamen Rider Zi-O 假面骑士Zi-O)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダージオウ(常磐ソウゴ)、仮面ライダーゲイツ(明光院ゲイツ)、仮面ライダーウォズ(ウォズ)、仮面ライダーツクヨミ(ツクヨミ)、仮面ライダーオーマジオウ(常磐ソウゴ/未来)', belt:'ジクウドライバー (Ziku-Driver 时空驱动器)+ライドウォッチ (Ridewatch 骑士手表)', finishers:'タイムブレーク (Time Break 时间斩)、キングタイムブレーク (King Time Break 王者时间斩)、オーマキック (逢魔踢)', villains:'タイムジャッカー (Time Jacker 时劫者)、スウォルツ(Swartz/首领)、ウール(Ur)、オーラ(Ora)、オーマジオウ(Ohma Zi-O)', vehicles:'ライドストライカー (Ride Striker 时间魔神)', catchphrase:'俺は…王様になる！(Ore wa... Ōsama ni Naru! 我…要成为王！)', armors:'ディケイドアーマー (Decade装甲)、ビルドアーマー (Build装甲)、ジオウII (Zi-O II)、ジオウトリニティ (Zi-O Trinity)、オーマジオウ (逢魔Zi-O)' } }
     ]
   },
@@ -1810,6 +1847,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'伊兹: 秘书Humagear，或人的搭档，拥有"抵达梦想"的使命。不破谏: AIMS队长，Vulcan，最初敌视Humagear，后来理解或人的信念。飞电是之助: 或人的爷爷，飞电智能前社长，Zero-One系统的创造者。',
         worldSetting:'舞台为近未来的日本。Humagear是飞电智能公司开发的AI机器人，拥有各种职业。Zero-One驱动器使用程序升华钥(Progrise Key)变身，每种升华钥对应一种动物能力。Zero-Two是Zero-One的最终形态，由或人自己创造。卫星Ark是Humagear管理卫星，因被注入恶意而觉醒自我意识。本作以"AI"和"梦想"为主题，探讨了人工智能与人类的关系——Humagear是否有梦想？人类与AI能否共存？',
         desc:'AI机器人Humagear已融入人类生活。飞电或人继承飞电智能社长之位，同时成为Zero-One。他坚信Humagear拥有梦想，但灭亡迅雷.net的恐怖袭击让AI与人类对立。',
+        keyItems:'飞电智能社长徽章, 程式升华钥(空白), 卫星泽亚通信器',
         keywords:['AI','Humagear','社长','灭亡迅雷','梦想'], powerLevel:'极高（Zero-Two超算预测，Hellrising Hopper改写现实）', locations:'飞电智能公司、A.I.M.S.基地、Zeatech基地、破灭之.net', jp:{ series:'仮面ライダーゼロワン (Kamen Rider Zero-One 假面骑士Zero-One)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーゼロワン(飛電或人/Aruto Hiden)、仮面ライダーバルカン(不破諫/Isamu Fuwa)、仮面ライダーバルキリー(刃唯阿/Yua Yaiba)、仮面ライダー迅(迅/Jin)、仮面ライダー滅(滅/Horobi)', belt:'飛電ゼロワンドライバー (Hiden Zero-One Driver)+プログライズキー (Progrise Key 程式升华钥)', finishers:'ライジングインパクト (Rising Impact 上升冲击)、シャイニングメガインパクト (Shining Mega Impact 闪耀巨力冲击)、リアライジングホッパーキック (Realizing Hopper Kick 觉悟蝗虫踢)', villains:'滅亡迅雷.net (MetsuBouJinRai.net)、アーク (Ark 方舟卫星)、天津垓 (Gai Amatsu/千騎)', vehicles:'ライズホッパー (Rise Hopper 飞电蝗虫)', catchphrase:'社長だけがライダーじゃない！(Shachō dake ga Rider ja nai! 不只是社长才是骑士！) 冗談です！(Jōdan desu! 开玩笑的！)', keys:'ライジングホッパー (跃升蝗虫)、シャイニングホッパー (闪耀蝗虫)、メタルクラスタホッパー (金属簇蝗虫)、ゼロツー (Zero-Two)' } },
       { id:'saber', year:'2020', name:'假面骑士Saber', sub:'圣剑与书', hero:'神山飞羽真', villain:'米吉多',
         allRiders:'假面骑士Saber(神山飞羽真)、假面骑士Blades(新堂伦太郎)、假面骑士Espada(富加宫贤人)、假面骑士Buster(尾上亮)、假面骑士剑斩(绯道莲)、假面骑士Slash(大秦寺哲雄)、假面骑士最光(尤里)、假面骑士Calibur(富加宫隼人/上条大地)、假面骑士Falchion(巴赫特)、假面骑士Saikou(尤里)、假面骑士Solomon(真理圣主)、假面骑士Storious(斯特利乌斯)、假面骑士Sabela(神代玲花)、假面骑士Durandal(神代凌牙)',
@@ -1825,6 +1863,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'须藤芽依: 飞羽真的编辑，充满活力的朋友。新堂伦太郎: Blades，水之剑士，飞羽真的忠实伙伴。富加宫贤人: Espada，雷之剑士，飞羽真的好友。尤里: 最光，光之剑士，1000年前守护世界的剑士。',
         worldSetting:'舞台为2020年的日本，连接着Wonder World（奇幻世界）。圣剑是自古传承的武器，每一把圣剑都有对应的剑士。奇幻驱动书(Wonder Ride Book)是变身的核心，每本书包含一个故事。Saber的形态变化通过更换驱动书实现。Xross Saber是飞羽真自己创造的最终形态，融合了所有圣剑的力量。本作以"故事"和"约定"为主题，飞羽真作为小说家，用故事的力量战斗。',
         desc:'小说家兼剑士神山飞羽真，使用圣剑与奇幻驱动书变身为Saber。Wonder World的传说与现实交织，他要用故事的力量守护约定。',
+        keyItems:'圣剑剑柄, 奇幻驱动书, 真理之剑徽章',
         keywords:['圣剑','奇幻驱动书','约定','剑士','Wonder World'], powerLevel:'创世级（刃王剑·十圣刃可改写世界，全能之力）', locations:'北区基地·奇幻书店神山、奇幻世界·仙境、真理之剑书库、南方基地', jp:{ series:'仮面ライダーセイバー (Kamen Rider Saber 假面骑士圣刃)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーセイバー(神山飛羽真)、仮面ライダーブレイズ(新堂倫太郎)、仮面ライダーエスパーダ(富加宮賢人)、仮面ライダーカリバー(富加宮隼人/上條大地)、仮面ライダー最光(ユーリ)', belt:'聖剣ソードライバー (Seiken Swordriver 圣剑驱动器)+ワンダーライドブック (Wonder Ride Book 奇幻驱动书)', finishers:'必殺読破！(Hissatsu Dokuha! 必杀读破！)、火炎剣必殺 (Kaenken Hissatsu 火炎剑必杀)、クロスセイバー (Cross Saber 刃王剑十字斩)', villains:'メギド (Megid 米吉多)、ストリウス(Storious/司掌故事)、レジエル(Legeiel/司掌神话)、ズオス(Zooous/司掌动物)、マスターロゴス(Master Logos)', vehicles:'ディアゴスピーダー (Diago Speeder 王者暴龙)', catchphrase:'物語の結末は、俺が決める！(Monogatari no Ketsumatsu wa, Ore ga Kimeru! 故事的结局，由我来决定！)', books:'ブレイブドラゴン (勇气飞龙)、ドラゴニックナイト (龙骑士)、クリムゾンドラゴン (赤红飞龙)、クロスセイバー (刃王剑)' } },
       { id:'revice', year:'2021', name:'假面骑士Revice', sub:'恶魔契约', hero:'五十岚一辉 / Vice', villain:'Deadmans',
         allRiders:'假面骑士Revi(五十岚一辉)、假面骑士Vice(恶魔Vice)、假面骑士Live(五十岚大二)、假面骑士Evil(影大二/Kagero)、假面骑士Jeanne(五十岚樱)、假面骑士Demons(门田广见/乔治·狩崎等)、假面骑士Vail(五十岚元太)、假面骑士Destream(五十岚元太)、假面骑士Over Demons(玉置豪)、假面骑士Aguilera(阿基蕾拉)、假面骑士Juuga(乔治·狩崎)',
@@ -1840,6 +1879,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'五十岚大二: Live，一辉的弟弟，正义感极强的青年。五十岚樱: Jeanne，一辉的妹妹，空手道高手。五十岚元太: 一辉的父亲，隐藏着Vail的秘密。乔治·狩崎: 天才科学家，骑士系统的开发者。阿基蕾拉: 从敌人变为伙伴，最终成为五十岚家族的一员。',
         worldSetting:'舞台为2021年的日本。人类体内潜藏着恶魔，通过罪恶印章(ViStamp)可以显现。Revice驱动器需要人类与恶魔搭档使用，Revi和Vice是二人一体的战斗伙伴。罪恶印章包含各种生物基因组，赋予不同的形态变化。本作以"家族"为核心主题——五十岚三兄妹与父母共同对抗恶魔，家族的力量是最强大的武器。五十岚家族世代与恶魔有特殊联系，这是故事的核心秘密。',
         desc:'五十岚一辉与体内的恶魔Vice签订契约，二人搭档变身为Revice。家族是最大的力量，也是最深的羁绊。这是一部关于"家庭"的假面骑士。',
+        keyItems:'罪恶印章(空白), 菲尼克斯组织徽章, 五十岚家澡堂毛巾',
         keywords:['恶魔','契约','家族','Vice','五十岚'], powerLevel:'高（究极Revice，恶魔之力）', locations:'幸福澡堂、菲尼克斯天空基地、亡命众基地、阿里马纳研究所', jp:{ series:'仮面ライダーリバイス (Kamen Rider Revice 假面骑士Revice)', henshin:'変身！(Henshin! 变身！) バディアップ！(Buddy Up!)', riders:'仮面ライダーリバイ(五十嵐一輝)＆バイス(Vice)、仮面ライダーライブ(五十嵐大二)＆カゲロウ(Kagero)、仮面ライダージャンヌ(五十嵐さくら)＆ラブコフ(Lovekov)', belt:'リバイスドライバー (Revice Driver)+バイスタンプ (Vistamp 罪恶印章)', finishers:'リバイスバイススタンピングフィニッシュ (Revice Vice Stamping Finish 双人必杀)', villains:'デッドマンズ (Deadmans 亡命众)、ギフ(Giff 恶魔始祖)、アギレラ(Aguilera/女王)、オルテカ(Orteca/鱿鱼)、フリオ(Julio/狼)', vehicles:'ホバーバイク (Hoverbike 悬浮摩托)', catchphrase:'俺が！バイスが！リバイスだ！(Ore ga! Vice ga! Revice da! 我就是！Vice就是！Revice！)', stamps:'レックス (暴龙)、メガロドン (巨齿鲨)、イーグル (猎鹰)、ギファードレックス (Giffard Rex)' } },
       { id:'geats', year:'2022', name:'假面骑士Geats', sub:'欲望大赛', hero:'浮世英寿', villain:'DGP运营',
         allRiders:'假面骑士Geats(浮世英寿)、假面骑士Tycoon(樱井景和)、假面骑士Na-Go(鞍马祢音)、假面骑士Buffa(吾妻道长)、假面骑士Punkjack(晴家温因)、假面骑士Ziin(支援者)、假面骑士Kekera(支援者)、假面骑士Kyuun(支援者)、假面骑士Beroba(支援者)、假面骑士Gazer(尼拉姆)、假面骑士Glare(基洛利)、假面骑士Regad(苏尔)',
@@ -1855,6 +1895,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'茨姆莉: DGP的引导员，后来成为创世女神，与英寿有深厚羁绊。樱井景和: Tycoon，善良的青年，渴望世界和平。鞍马祢音: Na-Go，网络偶像，寻找真正的自己。吾妻道长: Buffa，追求力量，英寿的竞争对手和朋友。',
         worldSetting:'舞台为2022年的日本，连接着未来世界。欲望大奖赛(DGP)由未来人运营，参赛者通过欲望驱动器(Desire Driver)和升级带扣(Raise Buckle)变身。Geats IX是英寿的最终形态，拥有创世之力。DGP的赞助商是未来人，他们通过观看比赛获得娱乐。本作以"欲望"和"转世"为主题——英寿2000年的轮回、参赛者的欲望、游戏的残酷规则，引发了对人性的深刻思考。',
         desc:'欲望大奖赛——胜者可以实现理想世界。浮世英寿是参赛2000年的不老骑士，他化身为Geats，目标是改变这个残酷的游戏规则。',
+        keyItems:'欲望驱动器核心, 任务盒, 茨姆莉的卡片',
         keywords:['生存游戏','欲望大奖赛','DGP','转世','狐狸'], powerLevel:'极高（极狐九尾形态，创世女神之力可改写世界）', locations:'欲望大奖赛竞技场、佐藤家·面馆、鞍马财团、邪魔徒花园', jp:{ series:'仮面ライダーギーツ (Kamen Rider Geats 假面骑士极狐)', henshin:'変身！(Henshin! 变身！) セット！(Set!)', riders:'仮面ライダーギーツ(浮世英寿/Ace Ukiyo)、仮面ライダータイクーン(桜井景和/Keiwa Sakurai)、仮面ライダーバッファ(吾妻道長/Michinaga Azuma)、仮面ライダーナーゴ(鞍馬祢音/Neon Kurama)、仮面ライダーパンクジャック(晴家ウィン/Win Hareruya)', belt:'デザイアドライバー (Desire Driver 欲望驱动器)+IDコア (ID Core ID核心)+レイズバックル (Raise Buckle 升级带扣)', finishers:'マグナムブーストビクトリー (Magnum Boost Victory 马格南推进胜利)、ブーストストライク (Boost Strike 推进打击)、ギーツIXキック (Geats IX Kick 极狐九尾踢)', villains:'デザイアグランプリ運営 (DGP运営)、スエル(Suel/创世神)、ニラム(Niram)、ギロリ(Girori/Game Master)、ベロバ(Beroba)、ジット(Jitto)', vehicles:'ブーストライカー (Boostriker 推进先锋)', catchphrase:'さあ、ここからがハイライトだ！(Sā, Koko kara ga Highlight da! 来吧，从现在开始才是高潮！)', buckles:'マグナム (Magnum 马格南/手枪)、ブースト (Boost 推进/加速)、ゾンビ (Zombie 丧尸)、ニンジャ (Ninja 忍者)、ビート (Beat 节拍/音乐)、ギーツIX (Geats IX 狐神形态)' } },
       { id:'gotchard', year:'2023', name:'假面骑士Gotchard', sub:'炼金术', hero:'一之濑宝太郎', villain:'冥黑三姐妹',
         allRiders:'假面骑士Gotchard(一之濑宝太郎)、假面骑士Majade(九堂凛音)、假面骑士Valvarad(黑钢斯帕纳)、假面骑士Dread(冥黑三姐妹/多人)、假面骑士Legend(凤樱·卡古亚)、假面骑士Wind(九堂风雅)',
@@ -1870,6 +1911,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'九堂凛音: 宝太郎的好友，天才炼金术师，Majade的变身者。黑钢斯帕纳: 炼金术学院的精英，Valvarad，最初是宝太郎的竞争对手。九堂风雅: 凛音的父亲，传奇炼金术师，Wind的变身者。凤樱·卡古亚: 来自平行世界的骑士Legend。',
         worldSetting:'舞台为2023年的日本。炼金术是隐藏在现实世界背后的神秘力量。Chemy是101只人工生命体，拥有各种能力（蒸汽蝗虫、武士、子弹等）。Gotchard驱动器通过融合两张Chemy卡牌进行变身，不同组合产生不同的形态。彩虹Gotchard(Rainbow Gotchard)是所有Chemy力量融合的最终形态。本作以"炼金术"和"收集"为主题，宝太郎的旅程是收集所有Chemy并成为真正的炼金术师的过程。',
         desc:'101只人工生命体Chemy被释放到人间。高中生一之濑宝太郎获得Gotchard驱动器，通过炼金术融合Chemy之力，目标是"抓住所有Chemy"！',
+        keyItems:'凯米卡(空白), 炼金学院徽章, 克米捕捉器',
         keywords:['炼金术','Chemy','卡牌','高中','收集'], powerLevel:'极高（彩虹Gotchard，贤者之石炼金术可创造万物）', locations:'炼金学院、九十九界·衔尾蛇世界、厨房一濑、炼金连合本部', jp:{ series:'仮面ライダーガッチャード (Kamen Rider Gotchard 假面骑士Gotchard)', henshin:'変身！(Henshin! 变身！) ガッチャ！(Gotcha!)', riders:'仮面ライダーガッチャード(一ノ瀬宝太郎)、仮面ライダーガッチャードデイブレイク(未来宝太郎)、仮面ライダーヴァルバラード(黒鋼スパナ)、仮面ライダーマジェード(九堂りんね)', belt:'ガッチャードライバー (Gotchardriver)+ライドケミーカード (Ride Chemy Card 骑乘凯米卡)', finishers:'ガッチャードキック (Gotchard Kick 凯米踢)、ガッチャードライバー必殺', villains:'冥黒の三姉妹 (Meikoku no San Shimai 冥黑三姐妹)、アトロポス(Atropos)、クロトー(Clotho)、ラケシス(Lachesis)、グリオン(Geryon 格里昂)', vehicles:'ゴルドダッシュ (Gold Dash 黄金冲刺号)', catchphrase:'ガッチャ！(Gotcha! 抓住了！)', chemies:'ホッパー1 (蝗虫1号)、スチームライナー (蒸汽列车)、アントレーラー (蚂蚁)、ウツボッチャマ (海鳝)' } },
       { id:'gavv', year:'2024', name:'假面骑士Gavv', sub:'零食骑士', hero:'生真', villain:'砂糖人',
         allRiders:'假面骑士Gavv(生真)、假面骑士Valen(绊斗)、假面骑士Vram(拉齐亚)、假面骑士Bitter Gavv(暗黑生真)',
@@ -1885,6 +1927,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'绊斗: 生真的人类朋友，Valen的变身者，一直支持生真。拉齐亚: 来自异世界的战士，Vram，生真的盟友。小夜: 生真的妹妹，在异世界等待哥哥归来。',
         worldSetting:'舞台为2024年的日本，连接着砂糖人界的异世界。砂糖人是异世界的种族，斯托马克家族通过绑架人类提取幸福来制作"黑暗零食"——一种成瘾性食品。生真是砂糖人与人类的混血儿，其Gavv器官（红Gavv）是叔公登特改造的产物，通过吃零食创造饱藏（Gochizo）并变身。不同零食对应不同形态的饱藏。斯托马克家族在人类世界以斯托马克公司为据点。本作以"零食"和"家族"为主题，表面上风格轻松有趣，但背后隐藏着家族斗争、种族歧视（混血）和人类被绑架的黑暗真相。',
         desc:'砂糖人界的混血青年生真，母亲被做成黑暗零食。他逃到人类世界，通过吃零食觉醒Gavv之力，变身为假面骑士Gavv。"零食也好邪恶也罢，我都会吃干抹净！"',
+        keyItems:'零食能量结晶, 砂糖人契约书, 饱藏之力碎片',
         keywords:['零食','饱藏','黑暗零食','斯托马克','Gavv'], powerLevel:'中高（饱藏能力，甜点武装）', locations:'格拉纽特世界、零食店·幸福零食、斯托马克公司、东京', jp:{ series:'仮面ライダーガヴ (Kamen Rider Gavv 假面骑士Gavv)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーガヴ(ショウマ)', belt:'ガヴドライバー (Gavv Driver)+ゴチゾウ (Gochizo 零食糖果)', finishers:'ガヴキック (Gavv Kick)、各形態必殺技', villains:'グラニュート (Granute 格朗纽特)', catchphrase:'お菓子でライダー！(Okashi de Rider! 用零食变身骑士！)' } },
       { id:'zeztz', year:'2025', name:'假面骑士Zeztz', sub:'梦境特工', hero:'万津莫', villain:'噩梦/NOX',
         allRiders:'假面骑士Zeztz(万津莫)',
@@ -1900,6 +1943,7 @@ const KAMEN_RIDER_DATA = {
         allSupporting:'宁梦: 人气女演员，出现在每个人的梦境中，协助万津莫。南美浪: 万津莫的妹妹，经纪人，对哥哥的特工身份毫不知情。藤见哲也: 超自然案件课警察，正义感强烈。南云那须香: 超自然案件课女警，高材生。Zero: CODE组织的司令官，万津莫的上司，可变身摩托车。',
         worldSetting:'舞台为2025年的日本。CODE是秘密防御组织，通过梦境向特工下达任务。万津莫的变身系统通过梦胶囊(Capsem)实现，不同颜色的胶囊对应不同能力：红色(身体能力)、蓝色(文明技术)、绿色(精神力)。Zeztz驱动器是腕力球型变身器。噩梦在人类梦境中诞生，由人类的负面情绪滋养。本作以"梦境"和"特工"为主题，融合间谍元素，探讨了现实与梦境的边界。',
         desc:'清醒梦能力者万津莫被秘密组织CODE招募为梦境特工。他使用Zeztz驱动器在梦境中变身为假面骑士Zeztz，对抗来自噩梦的威胁。他的梦，是拯救世界的任务。',
+        keyItems:'梦境导航仪, NOX碎片, 特工徽章',
         keywords:['清醒梦','CODE','梦胶囊','特工','噩梦'], powerLevel:'中（未知力量，待确认）', locations:'赛特都市·新东京、ZETT机关本部、异能者聚集地·地下街、时层研究设施', jp:{ series:'仮面ライダーゼッツ (Kamen Rider Zeztz 假面骑士Zeztz)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーゼッツ(未定)', belt:'ゼッツドライバー (Zeztz Driver)', finishers:'ゼッツキック (Zeztz Kick)', villains:'未知の敵 (Unknown Enemy)', catchphrase:'未知なる未来へ！(Michi naru Mirai e! 向着未知的未来！)' } }
     ]
   },
@@ -1907,24 +1951,24 @@ const KAMEN_RIDER_DATA = {
     name: '联动剧场版',
     desc: '跨越世界的英雄集结——假面骑士联动剧场版，多位骑士并肩作战对抗共同的威胁。',
     movies: [
-      { id:'the-first', year:'2005', name:'假面骑士 THE FIRST', sub:'THE FIRST', involved:'假面骑士1号、假面骑士2号', plot:'本乡猛被修卡绑架并改造为蝗虫改造人，但他逃脱了修卡的控制，化身为假面骑士1号对抗修卡。一文字隼人成为2号骑士。在都市的黑暗中，两位骑士联手对抗修卡的阴谋，同时面对自己作为改造人类的悲剧宿命。', villain:'修卡', desc:'假面骑士的重制版，都市暗影中的改造人悲剧', keywords:['THE FIRST','重制','1号','2号','都市'], jp:{ series:'仮面ライダー THE FIRST (Kamen Rider The First 假面骑士The First)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダー1号(本郷猛)、仮面ライダー2号(一文字隼人)', belt:'タイフーン (Typhoon)', finishers:'ライダーキック (Rider Kick)、ライダーパンチ (Rider Punch)', villains:'ショッカー (Shocker 修卡)', catchphrase:'改造人間の悲劇！(Kaizō Ningen no Higeki! 改造人的悲剧！)' } },
-      { id:'the-next', year:'2007', name:'假面骑士 THE NEXT', sub:'THE NEXT', involved:'假面骑士1号、假面骑士2号、假面骑士V3', plot:'本乡猛在改造人的身份中挣扎，修卡组织卷土重来，制造了新型改造人Plana怪人。一文字隼人作为2号骑士加入战斗，而风见志郎也成为了V3。血腥的改造人战争在都市中展开，骑士们必须面对自己作为改造人的宿命。', villain:'修卡、Plana怪人', desc:'成人向重制！血腥黑暗的改造人传说，骑士的宿命之战', keywords:['THE NEXT','重制','1号','2号','血腥'], jp:{ series:'仮面ライダー THE NEXT (Kamen Rider The Next 假面骑士The Next)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダー1号(本郷猛)、仮面ライダー2号(一文字隼人)、仮面ライダーV3(風見志郎)', belt:'タイフーン (Typhoon)', finishers:'ライダーキック (Rider Kick)、ライダーパンチ (Rider Punch)', villains:'ショッカー (Shocker 修卡)、プラーナ怪人 (Plana Kaijin)', catchphrase:'恐怖の改造人間！(Kyōfu no Kaizō Ningen! 恐怖的改造人！)' } },
-      { id:'movie-war-2010', year:'2009', name:'假面骑士×假面骑士 W&Decade MOVIE大战2010', sub:'MOVIE大战2010', involved:'Decade、W', plot:'故事分为三部分：Decade完结篇中，门矢士为了终结所有世界的融合危机，与各骑士展开最终决战；W的起源篇讲述翔太郎与菲利普初次搭档对抗掺杂体怪人；最终章两大骑士联手对抗超级死神博士率领的怪人军团。', villain:'超级死神博士、掺杂体怪人', desc:'平成骑士10周年纪念，Decade完结篇与W起源篇的史诗交汇', keywords:['Decade','W','10周年','世界融合','MOVIE大战'] },
-      { id:'movie-war-core', year:'2010', name:'假面骑士×假面骑士 OOO&W feat.Skull MOVIE大战CORE', sub:'MOVIE大战CORE', involved:'OOO、W、Skull', plot:'本次联动以"记忆"为核心主题。W篇中，鸣海庄吉化身的假面骑士Skull的过去被揭开；OOO篇中，映司与Ankh遭遇由人类欲望凝聚而成的怪物"Core"；最终章两大骑士携手对抗由欲望核心诞生的强敌。', villain:'假面骑士Core、欲望核心怪物', desc:'记忆与欲望的交织，鸣海庄吉的硬汉传说在此揭晓', keywords:['OOO','W','Skull','记忆','欲望'] },
-      { id:'movie-war-mega-max', year:'2011', name:'假面骑士×假面骑士 Fourze&OOO MOVIE大战MEGA MAX', sub:'MOVIE大战MEGA MAX', involved:'Fourze、OOO、Seven传说骑士', plot:'在OOO篇中，映司与Ankh面对来自未来的敌人波塞冬；Fourze篇讲述如月弦太朗在天之川学园对抗财团X的阴谋；最终章中，面对来自宇宙的超级黑洞威胁，Fourze与OOO联手，更获得七位传说骑士的力量支援。', villain:'财团X、假面骑士波塞冬、超银河王', desc:'宇宙与友情！Fourze与OOO跨越时空的超级大战', keywords:['Fourze','OOO','宇宙','友情','财团X'] },
-      { id:'movie-war-ultimatum', year:'2012', name:'假面骑士×假面骑士 Wizard&Fourze MOVIE大战Ultimatum', sub:'MOVIE大战Ultimatum', involved:'Wizard、Fourze', plot:'Fourze完结篇中，天之川学园被来自地底的怪人"阿库玛"入侵，弦太朗必须在毕业前守护学园；Wizard篇中，操真晴人遭遇名为"奥玛"的神秘魔法使；最终章魔法使与宇宙骑士联手对抗怪人联盟。', villain:'阿库玛、奥玛、怪人联盟', desc:'魔法与宇宙的交接，平成骑士世代交替的里程碑', keywords:['Wizard','Fourze','魔法','毕业','世代交替'] },
-      { id:'sengoku-movie-war', year:'2013', name:'假面骑士×假面骑士 铠武&Wizard 天下决胜之战国MOVIE大合战', sub:'天下决胜之战国MOVIE大合战', involved:'铠武、Wizard', plot:'Wizard篇中，晴人追查一个能夺取他人魔法力量的敌人；铠武篇中，葛叶纮汰与同伴们被神秘力量拉入战国时代的异世界，与战国武将化身的假面骑士们展开势力争夺；最终两大骑士联合守护两个世界的和平。', villain:'邪恶魔法使、战国武将怪人', desc:'穿越战国乱世，铠武与Wizard的天下决胜大合战', keywords:['铠武','Wizard','战国','穿越','魔法'] },
-      { id:'movie-war-full-throttle', year:'2014', name:'假面骑士×假面骑士 Drive&铠武 MOVIE大战Full Throttle', sub:'MOVIE大战Full Throttle', involved:'Drive、铠武', plot:'铠武完结篇中，纮汰在成为"起始之男"后，面对来自海姆冥界森林最后的威胁；Drive篇中，泊进之介在调查一起与机械变异体相关的案件时发现背后隐藏着更大的阴谋；最终两位骑士以"速度"与"力量"的完美结合粉碎邪恶势力的野心。', villain:'机械变异体首领、海姆冥界残余', desc:'速度与力量的碰撞，Drive与铠武的时代交接之战', keywords:['Drive','铠武','机械变异体','海姆冥界','时代交接'] },
-      { id:'chou-movie-war-genesis', year:'2015', name:'假面骑士×假面骑士 Ghost&Drive 超MOVIE大战Genesis', sub:'超MOVIE大战Genesis', involved:'Ghost、Drive', plot:'Drive篇中，进之介遭遇了来自10年后未来的危机，自己的儿子泊英志穿越时空而来；Ghost篇中，天空寺尊为了夺回被夺走的眼魂与来自未来的敌人展开激战；最终过去与未来的骑士们联手守护人类与幽灵共存的未来。', villain:'未来邪恶科学家、时间悖论怪人', desc:'穿越十年时空，Ghost与Drive为守护未来而战', keywords:['Ghost','Drive','时间穿越','父子','未来'] },
-      { id:'heisei-gen-pac-man', year:'2016', name:'假面骑士平成世代 Dr.吃豆人对Ex-Aid&Ghost with传奇骑士', sub:'Dr.吃豆人对Ex-Aid&Ghost', involved:'Ex-Aid、Ghost、W、OOO、Fourze', plot:'一场由神秘病毒引发的危机席卷日本，感染者会逐渐消失。游戏公司幻梦集团的社长檀黎斗与吃豆人博士联手，试图利用游戏病毒控制世界。宝生永梦变身为Ex-Aid，与天空寺尊的Ghost并肩作战，传说中的平成骑士也穿越时空前来助阵。', villain:'Dr.吃豆人、檀黎斗、游戏病毒', desc:'吃豆人入侵！Ex-Aid与Ghost携手传奇骑士保卫世界', keywords:['Ex-Aid','Ghost','吃豆人','游戏','传奇骑士'] },
-      { id:'heisei-gen-final', year:'2017', name:'假面骑士平成世代 FINAL Build&Ex-Aid with传奇骑士', sub:'FINAL Build&Ex-Aid', involved:'Build、Ex-Aid、OOO、Fourze、铠武、Ghost', plot:'在Ex-Aid完结篇中，永梦面对试图将所有人类数据化的终极威胁"最上魁星"；Build篇中，桐生战兔在平行世界中发现了一个没有天空之壁的日本；两位天才骑士跨越平行世界联手，集结历代平成骑士的力量。', villain:'最上魁星、平行世界侵略者', desc:'平成骑士最终章，Build与Ex-Aid跨越平行世界的天才对决', keywords:['平成','联动','世代','Final','Build'], jp:{ series:'仮面ライダー平成ジェネレーションズ (Heisei Generations 平成世代Final)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダービルド(桐生戦兎)、仮面ライダーエグゼイド(宝生永夢)、仮面ライダークローズ(万丈龍我)', belt:'ビルドドライバー (Build Driver)、ゲーマドライバー (Gamer Driver)', finishers:'ボルテックフィニッシュ (Vortex Finish)、マイティクリティカルストライク (Mighty Critical Strike)', villains:'ネビュラバグスター (Nebula Bugster)、最上魁星', catchphrase:'平成の絆！(Heisei no Kizuna! 平成的羁绊！)' } },
-      { id:'cho-super-hero-taisen', year:'2017', name:'假面骑士×超级战队 超超级英雄大战', sub:'超超级英雄大战', involved:'Ex-Aid、Brave、赤忍者、青忍者', plot:'Ex-Aid的世界与超级战队的世界发生了碰撞，游戏与竞速的法则交织在一起。宝生永梦与镜飞彩化身的Ex-Aid与Brave，与手里剑战队忍忍者联手，对抗企图将所有英雄数据化的修卡首领。', villain:'修卡首领', desc:'游戏与竞速的碰撞！Ex-Aid与忍者战队联手对抗修卡', keywords:['超超级','战队','Ex-Aid','游戏','竞速'], jp:{ series:'仮面ライダー×スーパー戦隊 超スーパーヒーロー大戦 (Cho Super Hero Taisen)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーエグゼイド(宝生永夢)、仮面ライダーブレイブ(鏡飛彩)', belt:'ゲーマドライバー (Gamer Driver)', finishers:'マイティクリティカルストライク (Mighty Critical Strike)', villains:'ショッカー首領 (Shocker Leader)', catchphrase:'超スーパーな戦い！(Chō Super na Tatakai! 超超级的战斗！)' } },
-      { id:'heisei-gen-forever', year:'2018', name:'假面骑士平成世代 FOREVER', sub:'FOREVER', involved:'ZIO、Build、全平成骑士', plot:'时王常磐庄吾在成为魔王之前，遭遇了一个企图抹除假面骑士历史的神秘敌人——泰德。这个来自异世界的时劫者认为假面骑士是虚构的存在，要将所有骑士从历史中彻底消除。庄吾与战兔必须唤醒人们心中对假面骑士的记忆。', villain:'泰德（时劫者）、异类骑士', desc:'平成骑士最后的集结，守护被遗忘的英雄传说', keywords:['平成','FOREVER','Zi-O','Build','记忆'], jp:{ series:'仮面ライダー平成ジェネレーションズFOREVER (Heisei Generations FOREVER 平成世代·永远)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダージオウ(常磐ソウゴ)、仮面ライダービルド(桐生戦兎)、仮面ライダーW(左翔太郎&フィリップ)', belt:'ジクウドライバー (Ziku-Driver)、ビルドドライバー (Build Driver)', finishers:'タイムブレーク (Time Break)、ボルテックフィニッシュ (Vortex Finish)', villains:'アナザーダブル (Another W)、ティード (Tid 提德)', catchphrase:'永遠の平成ライダー！(Eien no Heisei Rider! 永远的平成骑士！)' } },
-      { id:'reiwa-the-first-generation', year:'2019', name:'假面骑士令和 The First Generation', sub:'令和第一世代', involved:'Zero-One、Zi-O', plot:'时王常磐庄吾在成为逢魔Zi-O的道路上，遭遇了来自令和时代的假面骑士Zero-One飞电或人。时间线被扭曲，令和与平成的时代交错在一起。庄吾与或人必须联手对抗时间异变背后的真正敌人——时间管理局的Finis。', villain:'Another Zero-One、Finis（时间管理局）', desc:'令和骑士的诞生！Zero-One与Zi-O跨越时代的初次联手', keywords:['令和','第一世代','Zero-One','Zi-O','时间线'], jp:{ series:'仮面ライダー令和 ザ・ファースト・ジェネレーション (Reiwa The First Generation)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーゼロワン(飛電或人)、仮面ライダージオウ(常磐ソウゴ)', belt:'飛電ゼロワンドライバー (Zero-One Driver)、ジクウドライバー (Ziku-Driver)', finishers:'ライジングインパクト (Rising Impact)、タイムブレーク (Time Break)', villains:'アナザーゼロワン (Another Zero-One)、フィーニス (Finis)', catchphrase:'令和の幕開け！(Reiwa no Makuake! 令和的开幕！)' } },
-      { id:'super-hero-taisen', year:'2012', name:'假面骑士×超级战队 超级英雄大战', sub:'超级英雄大战', involved:'Decade、Fourze、豪快红、全骑士、全战队', plot:'门矢士率领假面骑士军团与凯普特·玛贝拉斯率领的超级战队展开全面战争。两大特摄英雄集团的冲突背后，隐藏着邪恶组织"大残虐"企图毁灭所有英雄的阴谋。在激烈的战斗中，骑士与战队从对立走向理解，最终联手对抗真正的敌人。', villain:'大残虐、大首领', desc:'骑士VS战队！两大特摄英雄集团的历史性对决与联手', keywords:['超级英雄','大战','战队','Marvelous','DCD'], jp:{ series:'仮面ライダー×スーパー戦隊 スーパーヒーロー大戦 (Super Hero Taisen)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーディケイド(門矢士)、仮面ライダーフォーゼ(如月弦太朗)、仮面ライダーオーズ(火野映司)、ゴーカイレッド(キャプテン・マーベラス)', belt:'ディケイドライバー (Decadriver)、フォーゼドライバー (Fourze Driver)', finishers:'ディメンションキック (Dimension Kick)、ライダーロケットドリルキック (Rider Rocket Drill Kick)', villains:'大ショッカー (Dai-Shocker)、大ザンギャック (Dai-Zangyack)', catchphrase:'全ライダー×全戦隊！(Zen Rider × Zen Sentai! 全骑士×全战队！)' } },
-      { id:'super-hero-taisen-z', year:'2013', name:'假面骑士×超级战队×宇宙刑事 超级英雄大战Z', sub:'超级英雄大战Z', involved:'Wizard、兽电战队、宇宙刑事卡邦', plot:'宇宙犯罪组织"宇宙修卡"卷土重来，企图以"时空破灭装置"吞噬整个宇宙。假面骑士Wizard与兽电战队强龙者率先迎战，宇宙刑事卡邦也加入战局。三大特摄英雄首次同台，从各自的世界集结而来。', villain:'宇宙修卡、时空破灭装置', desc:'三大特摄英雄集结！骑士、战队、宇宙刑事共战宇宙修卡', keywords:['宇宙修卡','Wizard','兽电战队','卡邦','三大特摄'] },
-      { id:'kamen-rider-taisen', year:'2014', name:'假面骑士大乱斗 假面骑士大战', sub:'平成骑士VS昭和骑士', involved:'铠武、1号、全平成骑士、全昭和骑士', plot:'在神秘组织"巴丹"的操纵下，平成骑士与昭和骑士之间爆发了前所未有的内战。葛叶纮汰与铠武站在平成骑士一方，而本乡猛的假面骑士1号则率领昭和骑士应战。两代骑士因理念不同而对立，最终跨越时代的骑士们放下分歧。', villain:'巴丹、暗影月亮', desc:'平成VS昭和！跨越时代的骑士内战与信念碰撞', keywords:['平成VS昭和','铠武','1号','巴丹','内战'] },
-      { id:'kamen-rider-1-go', year:'2016', name:'假面骑士1号', sub:'假面骑士1号', involved:'假面骑士1号、Ghost、Specter', plot:'本乡猛在海外战斗多年后回到日本，却发现自己变成了一个被通缉的逃亡者。神秘组织"诺瓦·修卡"制造了新型改造人，并试图夺取本乡体内蕴藏的骑士力量。天空寺尊化身的Ghost在调查幽灵事件时与本乡相遇。', villain:'诺瓦·修卡、地狱大使', desc:'初代骑士归来！本乡猛燃烧生命的最终之战', keywords:['假面骑士1号','本乡猛','诺瓦修卡','Ghost','传奇归来'] }
+      { id:'the-first', year:'2005', name:'假面骑士 THE FIRST', sub:'THE FIRST', involved:'假面骑士1号、假面骑士2号', plot:'本乡猛被修卡绑架并改造为蝗虫改造人，但他逃脱了修卡的控制，化身为假面骑士1号对抗修卡。一文字隼人成为2号骑士。在都市的黑暗中，两位骑士联手对抗修卡的阴谋，同时面对自己作为改造人类的悲剧宿命。', villain:'修卡', desc:'假面骑士的重制版，都市暗影中的改造人悲剧', keyItems:'改造手术记录, 初代修卡徽章, 台风腰带设计图', powerLevel:'中低（改造人级别，与初代1号2号同级）', locations:'修卡秘密基地, 东京市区, 本乡猛的实验室', villainDetail:'修卡(Shocker): 秘密结社，将人类改造为改造人怪人，企图征服世界。在THE FIRST中，修卡以都市暗影中的秘密组织形象出现，更加写实和冷酷。', allVillains:'修卡(Shocker): 纳粹残党组建的邪恶组织，在THE FIRST中呈现为更加现代化的恐怖组织。修卡首领: 幕后统治者，以冷酷的方式指挥组织。蝙蝠怪人: 修卡的主要战斗员之一。蛇怪人: 修卡派出的刺客。', keywords:['THE FIRST','重制','1号','2号','都市'], jp:{ series:'仮面ライダー THE FIRST (Kamen Rider The First 假面骑士The First)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダー1号(本郷猛)、仮面ライダー2号(一文字隼人)', belt:'タイフーン (Typhoon)', finishers:'ライダーキック (Rider Kick)、ライダーパンチ (Rider Punch)', villains:'ショッカー (Shocker 修卡)', catchphrase:'改造人間の悲劇！(Kaizō Ningen no Higeki! 改造人的悲剧！)' } },
+      { id:'the-next', year:'2007', name:'假面骑士 THE NEXT', sub:'THE NEXT', involved:'假面骑士1号、假面骑士2号、假面骑士V3', plot:'本乡猛在改造人的身份中挣扎，修卡组织卷土重来，制造了新型改造人Plana怪人。一文字隼人作为2号骑士加入战斗，而风见志郎也成为了V3。血腥的改造人战争在都市中展开，骑士们必须面对自己作为改造人的宿命。', villain:'修卡、Plana怪人', desc:'成人向重制！血腥黑暗的改造人传说，骑士的宿命之战', keyItems:'高级改造人细胞, Plana怪人组织图, V3改造计划书', powerLevel:'中（1号2号V3联手，改造人战力）', locations:'修卡地下基地, 东京暗巷, 风见志郎的家', villainDetail:'修卡(Shocker): 在THE NEXT中卷土重来，利用偶像明星的包装进行更隐蔽的恐怖活动。Plana: 修卡旗下的偶像事务所，作为掩护进行邪恶活动。', allVillains:'修卡(Shocker): 以偶像事务所Plana为掩护进行邪恶活动。风见志郎/修卡骑士: 被修卡利用的悲剧人物。Plana怪人: 以偶像身份伪装的修卡改造怪人。修卡首领: 幕后操控者。', keywords:['THE NEXT','重制','1号','2号','血腥'], jp:{ series:'仮面ライダー THE NEXT (Kamen Rider The Next 假面骑士The Next)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダー1号(本郷猛)、仮面ライダー2号(一文字隼人)、仮面ライダーV3(風見志郎)', belt:'タイフーン (Typhoon)', finishers:'ライダーキック (Rider Kick)、ライダーパンチ (Rider Punch)', villains:'ショッカー (Shocker 修卡)、プラーナ怪人 (Plana Kaijin)', catchphrase:'恐怖の改造人間！(Kyōfu no Kaizō Ningen! 恐怖的改造人！)' } },
+      { id:'movie-war-2010', year:'2009', name:'假面骑士×假面骑士 W&Decade MOVIE大战2010', sub:'MOVIE大战2010', involved:'Decade、W', plot:'故事分为三部分：Decade完结篇中，门矢士为了终结所有世界的融合危机，与各骑士展开最终决战；W的起源篇讲述翔太郎与菲利普初次搭档对抗掺杂体怪人；最终章两大骑士联手对抗超级死神博士率领的怪人军团。', villain:'超级死神博士、掺杂体怪人', desc:'平成骑士10周年纪念，Decade完结篇与W起源篇的史诗交汇', keyItems:'世界融合残片, 超级死神博士的笔记, W&Decade联手纪念章', powerLevel:'极高（Decade完全形态+W极致形态）', locations:'光照相馆, 风都街头, 修卡残党基地, 世界融合点', villainDetail:'超级死神博士(Super Deathborg): 修卡残党的最高科学家，企图利用Decade的世界融合之力复活修卡。掺杂体怪人(Dopant): 风都出现的盖亚记忆体怪人。', allVillains:'超级死神博士(Super Deathborg): 修卡残党的最高科学家，拥有强大的战斗力和科学知识。掺杂体怪人: 被盖亚记忆体侵蚀的人类，各具特殊能力。修卡残党: 在各个世界中潜伏的修卡残余势力。', keywords:['Decade','W','10周年','世界融合','MOVIE大战'] },
+      { id:'movie-war-core', year:'2010', name:'假面骑士×假面骑士 OOO&W feat.Skull MOVIE大战CORE', sub:'MOVIE大战CORE', involved:'OOO、W、Skull', plot:'本次联动以"记忆"为核心主题。W篇中，鸣海庄吉化身的假面骑士Skull的过去被揭开；OOO篇中，映司与Ankh遭遇由人类欲望凝聚而成的怪物"Core"；最终章两大骑士携手对抗由欲望核心诞生的强敌。', villain:'假面骑士Core、欲望核心怪物', desc:'记忆与欲望的交织，鸣海庄吉的硬汉传说在此揭晓', keyItems:'欲望核心碎片, 鸣海庄吉的硬汉帽, 记忆体研究笔记', powerLevel:'极高（OOO恐龙联组+W极致形态+Skull）', locations:'风都, 鸿上基金会, 记忆核心空间, 鸣海侦探事务所', villainDetail:'核心怪人(Core): 由人类欲望凝结而成的怪物，企图将世界核心化。掺杂体怪人: 与核心怪人联手的盖亚记忆体怪人。', allVillains:'核心怪人(Core): 欲望的实体化怪物，拥有强大的破坏力。掺杂体怪人: 与核心怪人联手，企图共同统治世界。蜘蛛掺杂体: 核心怪人中的主要干部。', keywords:['OOO','W','Skull','记忆','欲望'] },
+      { id:'movie-war-mega-max', year:'2011', name:'假面骑士×假面骑士 Fourze&OOO MOVIE大战MEGA MAX', sub:'MOVIE大战MEGA MAX', involved:'Fourze、OOO、Seven传说骑士', plot:'在OOO篇中，映司与Ankh面对来自未来的敌人波塞冬；Fourze篇讲述如月弦太朗在天之川学园对抗财团X的阴谋；最终章中，面对来自宇宙的超级黑洞威胁，Fourze与OOO联手，更获得七位传说骑士的力量支援。', villain:'财团X、假面骑士波塞冬、超银河王', desc:'宇宙与友情！Fourze与OOO跨越时空的超级大战', keyItems:'超银河王碎片, 财团X机密文件, 未来骑士数据芯片', powerLevel:'极高（Fourze宇宙形态+OOO恐龙联组+七传说骑士）', locations:'天高高中, 鸿上基金会, 宇宙空间站, 财团X基地', villainDetail:'财团X(Foundation X): 神秘的跨国财团，资助各种邪恶组织，企图获取骑士们的力量。超银河王(Super Galaxy King): 来自未来的邪恶存在。', allVillains:'财团X(Foundation X): 神秘跨国财团，幕后资助各种邪恶组织。超银河王(Super Galaxy King): 来自未来的邪恶存在，拥有超高科技。财团X战斗员: 财团X的武装部队。', keywords:['Fourze','OOO','宇宙','友情','财团X'] },
+      { id:'movie-war-ultimatum', year:'2012', name:'假面骑士×假面骑士 Wizard&Fourze MOVIE大战Ultimatum', sub:'MOVIE大战Ultimatum', involved:'Wizard、Fourze', plot:'Fourze完结篇中，天之川学园被来自地底的怪人"阿库玛"入侵，弦太朗必须在毕业前守护学园；Wizard篇中，操真晴人遭遇名为"奥玛"的神秘魔法使；最终章魔法使与宇宙骑士联手对抗怪人联盟。', villain:'阿库玛、奥玛、怪人联盟', desc:'魔法与宇宙的交接，平成骑士世代交替的里程碑', keyItems:'阿库玛之核, 奥玛的魔法书, 天高毕业纪念册', powerLevel:'极高（Wizard无限形态+Fourze宇宙形态）', locations:'天高高中, 魔法师工坊, 阿库玛地下王国, 毕业典礼会场', villainDetail:'阿库玛(Akuma): 地下王国的邪恶统治者，企图将地面世界拖入黑暗。奥玛(Oma): 强大的魔法师，使用黑暗魔法。', allVillains:'阿库玛(Akuma): 地下王国的邪恶统治者，率领怪人军团。奥玛(Oma): 黑暗魔法师，拥有强大的魔法力量。阿库玛怪人军团: 地下王国的各种怪人战士。', keywords:['Wizard','Fourze','魔法','毕业','世代交替'] },
+      { id:'sengoku-movie-war', year:'2013', name:'假面骑士×假面骑士 铠武&Wizard 天下决胜之战国MOVIE大合战', sub:'天下决胜之战国MOVIE大合战', involved:'铠武、Wizard', plot:'Wizard篇中，晴人追查一个能夺取他人魔法力量的敌人；铠武篇中，葛叶纮汰与同伴们被神秘力量拉入战国时代的异世界，与战国武将化身的假面骑士们展开势力争夺；最终两大骑士联合守护两个世界的和平。', villain:'邪恶魔法使、战国武将怪人', desc:'穿越战国乱世，铠武与Wizard的天下决胜大合战', keyItems:'战国武将之魂, 时空穿越装置, 海姆冥界地图', powerLevel:'极高（铠武极形态+Wizard无限形态）', locations:'战国异世界, 泽芽市, 魔法师工坊, 战国武将城堡', villainDetail:'战国武将之魂: 被邪恶力量唤醒的战国武将灵魂，企图在异世界建立黑暗帝国。海姆冥界怪人: 从海姆冥界森林中出现的怪物。', allVillains:'战国武将之魂: 被邪恶力量唤醒的战国武将，各具特殊能力。海姆冥界怪人: 来自海姆冥界森林的怪物。邪恶武者: 战国武将之魂的首领。', keywords:['铠武','Wizard','战国','穿越','魔法'] },
+      { id:'movie-war-full-throttle', year:'2014', name:'假面骑士×假面骑士 Drive&铠武 MOVIE大战Full Throttle', sub:'MOVIE大战Full Throttle', involved:'Drive、铠武', plot:'铠武完结篇中，纮汰在成为"起始之男"后，面对来自海姆冥界森林最后的威胁；Drive篇中，泊进之介在调查一起与机械变异体相关的案件时发现背后隐藏着更大的阴谋；最终两位骑士以"速度"与"力量"的完美结合粉碎邪恶势力的野心。', villain:'机械变异体首领、海姆冥界残余', desc:'速度与力量的碰撞，Drive与铠武的时代交接之战', keyItems:'机械变异体核心, 海姆冥界果实标本, Drive与铠武联手勋章', powerLevel:'极高（Drive方程式形态+铠武始源之男）', locations:'警视厅特殊科, 泽芽市, 海姆冥界森林, Drive车库', villainDetail:'机械变异体(Roidmude): 拥有超进化能力的机械生命体，企图消灭人类。海姆冥界怪人: 妄图利用海姆冥界果实的力量统治世界。', allVillains:'机械变异体(Roidmude): 拥有超进化能力的机械生命体，核心干部拥有特殊能力。海姆冥界怪人: 来自海姆冥界森林的怪物。机械变异体001: 主要干部之一。', keywords:['Drive','铠武','机械变异体','海姆冥界','时代交接'] },
+      { id:'chou-movie-war-genesis', year:'2015', name:'假面骑士×假面骑士 Ghost&Drive 超MOVIE大战Genesis', sub:'超MOVIE大战Genesis', involved:'Ghost、Drive', plot:'Drive篇中，进之介遭遇了来自10年后未来的危机，自己的儿子泊英志穿越时空而来；Ghost篇中，天空寺尊为了夺回被夺走的眼魂与来自未来的敌人展开激战；最终过去与未来的骑士们联手守护人类与幽灵共存的未来。', villain:'未来邪恶科学家、时间悖论怪人', desc:'穿越十年时空，Ghost与Drive为守护未来而战', keyItems:'未来科技芯片, 时间悖论记录, 泊英志的玩具车', powerLevel:'极高（Ghost无限魂+Drive方程式形态）', locations:'大天空寺, 警视厅特殊科, 时间裂隙, 未来东京', villainDetail:'时间悖论怪人: 来自未来的邪恶存在，企图扭曲时间线。未来机械变异体: 从未来穿越而来的更强大的机械变异体。', allVillains:'时间悖论怪人: 未来时间线的扭曲产物，拥有操控时间的能力。未来机械变异体: 更强大的机械变异体进化形态。时间悖论核心: 时间扭曲的源头。', keywords:['Ghost','Drive','时间穿越','父子','未来'] },
+      { id:'heisei-gen-pac-man', year:'2016', name:'假面骑士平成世代 Dr.吃豆人对Ex-Aid&Ghost with传奇骑士', sub:'Dr.吃豆人对Ex-Aid&Ghost', involved:'Ex-Aid、Ghost、W、OOO、Fourze', plot:'一场由神秘病毒引发的危机席卷日本，感染者会逐渐消失。游戏公司幻梦集团的社长檀黎斗与吃豆人博士联手，试图利用游戏病毒控制世界。宝生永梦变身为Ex-Aid，与天空寺尊的Ghost并肩作战，传说中的平成骑士也穿越时空前来助阵。', villain:'Dr.吃豆人、檀黎斗、游戏病毒', desc:'吃豆人入侵！Ex-Aid与Ghost携手传奇骑士保卫世界', keyItems:'游戏病毒样本, 吃豆人博士的手套, 幻梦集团游戏卡', powerLevel:'极高（Ex-Aid无敌玩家+Ghost无限魂+传奇骑士）', locations:'圣都大学附属医院, 幻梦公司, 大天空寺, 游戏世界', villainDetail:'吃豆人病毒(Pac-Man Virus): 游戏角色吃豆人被注入病毒后变成的邪恶存在，企图将现实世界游戏化。幻梦集团(Genm Corp): 利用游戏病毒进行邪恶实验。', allVillains:'吃豆人病毒(Pac-Man Virus): 被病毒污染的吃豆人，拥有吞噬一切的能力。幻梦集团(Genm Corp): 利用游戏病毒进行邪恶实验的组织。游戏病毒怪人: 由游戏病毒创造的怪物。', keywords:['Ex-Aid','Ghost','吃豆人','游戏','传奇骑士'] },
+      { id:'heisei-gen-final', year:'2017', name:'假面骑士平成世代 FINAL Build&Ex-Aid with传奇骑士', sub:'FINAL Build&Ex-Aid', involved:'Build、Ex-Aid、OOO、Fourze、铠武、Ghost', plot:'在Ex-Aid完结篇中，永梦面对试图将所有人类数据化的终极威胁"最上魁星"；Build篇中，桐生战兔在平行世界中发现了一个没有天空之壁的日本；两位天才骑士跨越平行世界联手，集结历代平成骑士的力量。', villain:'最上魁星、平行世界侵略者', desc:'平成骑士最终章，Build与Ex-Aid跨越平行世界的天才对决', keyItems:'平行世界通信器, 天才科学家笔记, 平成骑士集结徽章', powerLevel:'创世级（Build天才形态+Ex-Aid无敌玩家+全平成骑士之力）', locations:'圣都大学附属医院, 平行世界(无天空之壁), 世界融合点, 咖啡馆Nascita', villainDetail:'平行世界融合者: 企图利用平行世界融合之力消灭所有骑士。财团X(Foundation X): 幕后操纵平行世界融合的邪恶组织。', allVillains:'平行世界融合者: 来自平行世界的邪恶存在，拥有融合世界的力量。财团X(Foundation X): 幕后操纵邪恶计划的跨国组织。融合怪人: 平行世界融合产生的怪物。', keywords:['平成','联动','世代','Final','Build'], jp:{ series:'仮面ライダー平成ジェネレーションズ (Heisei Generations 平成世代Final)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダービルド(桐生戦兎)、仮面ライダーエグゼイド(宝生永夢)、仮面ライダークローズ(万丈龍我)', belt:'ビルドドライバー (Build Driver)、ゲーマドライバー (Gamer Driver)', finishers:'ボルテックフィニッシュ (Vortex Finish)、マイティクリティカルストライク (Mighty Critical Strike)', villains:'ネビュラバグスター (Nebula Bugster)、最上魁星', catchphrase:'平成の絆！(Heisei no Kizuna! 平成的羁绊！)' } },
+      { id:'cho-super-hero-taisen', year:'2017', name:'假面骑士×超级战队 超超级英雄大战', sub:'超超级英雄大战', involved:'Ex-Aid、Brave、赤忍者、青忍者', plot:'Ex-Aid的世界与超级战队的世界发生了碰撞，游戏与竞速的法则交织在一起。宝生永梦与镜飞彩化身的Ex-Aid与Brave，与手里剑战队忍忍者联手，对抗企图将所有英雄数据化的修卡首领。', villain:'修卡首领', desc:'游戏与竞速的碰撞！Ex-Aid与忍者战队联手对抗修卡', keyItems:'英雄联盟徽章, 修卡首领的权杖, 战队骑士联盟协议', powerLevel:'极高（Ex-Aid无敌玩家+Brave+忍者战队）', locations:'幻梦公司, 忍者战队基地, 英雄竞技场, 修卡总部', villainDetail:'修卡首领(Shocker Leader): 大修卡的最高统治者，企图联合所有邪恶势力消灭英雄。战队反派联盟: 与修卡联手的战队系列反派。', allVillains:'修卡首领(Shocker Leader): 大修卡的最高统治者，拥有强大的力量。战队反派联盟: 与修卡联手的战队系列反派。修卡战斗员: 大修卡的基本战斗单位。', keywords:['超超级','战队','Ex-Aid','游戏','竞速'], jp:{ series:'仮面ライダー×スーパー戦隊 超スーパーヒーロー大戦 (Cho Super Hero Taisen)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーエグゼイド(宝生永夢)、仮面ライダーブレイブ(鏡飛彩)', belt:'ゲーマドライバー (Gamer Driver)', finishers:'マイティクリティカルストライク (Mighty Critical Strike)', villains:'ショッカー首領 (Shocker Leader)', catchphrase:'超スーパーな戦い！(Chō Super na Tatakai! 超超级的战斗！)' } },
+      { id:'heisei-gen-forever', year:'2018', name:'假面骑士平成世代 FOREVER', sub:'FOREVER', involved:'ZIO、Build、全平成骑士', plot:'时王常磐庄吾在成为魔王之前，遭遇了一个企图抹除假面骑士历史的神秘敌人——泰德。这个来自异世界的时劫者认为假面骑士是虚构的存在，要将所有骑士从历史中彻底消除。庄吾与战兔必须唤醒人们心中对假面骑士的记忆。', villain:'泰德（时劫者）、异类骑士', desc:'平成骑士最后的集结，守护被遗忘的英雄传说', keyItems:'记忆保存装置, 骑士历史石碑, 泰德的时间装置', powerLevel:'创世级（Zi-O+Build+全平成骑士，守护历史之力）', locations:'九时五时堂, 咖啡馆Nascita, 记忆空间, 泰德的时间装置', villainDetail:'泰德(Tid): 来自异世界的时劫者，认为假面骑士只是虚构的存在，企图将所有骑士从历史中抹除。异类骑士(Another Rider): 被泰德创造的扭曲骑士。', allVillains:'泰德(Tid): 来自异世界的时劫者，拥有抹除历史的能力。异类W(Another W): 被泰德创造的扭曲版W。异类骑士: 各时代被扭曲的骑士形象。时劫者组织: 泰德所属的神秘组织。', keywords:['平成','FOREVER','Zi-O','Build','记忆'], jp:{ series:'仮面ライダー平成ジェネレーションズFOREVER (Heisei Generations FOREVER 平成世代·永远)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダージオウ(常磐ソウゴ)、仮面ライダービルド(桐生戦兎)、仮面ライダーW(左翔太郎&フィリップ)', belt:'ジクウドライバー (Ziku-Driver)、ビルドドライバー (Build Driver)', finishers:'タイムブレーク (Time Break)、ボルテックフィニッシュ (Vortex Finish)', villains:'アナザーダブル (Another W)、ティード (Tid 提德)', catchphrase:'永遠の平成ライダー！(Eien no Heisei Rider! 永远的平成骑士！)' } },
+      { id:'reiwa-the-first-generation', year:'2019', name:'假面骑士令和 The First Generation', sub:'令和第一世代', involved:'Zero-One、Zi-O', plot:'时王常磐庄吾在成为逢魔Zi-O的道路上，遭遇了来自令和时代的假面骑士Zero-One飞电或人。时间线被扭曲，令和与平成的时代交错在一起。庄吾与或人必须联手对抗时间异变背后的真正敌人——时间管理局的Finis。', villain:'Another Zero-One、Finis（时间管理局）', desc:'令和骑士的诞生！Zero-One与Zi-O跨越时代的初次联手', keyItems:'时间管理局徽章, 时代交汇残片, 令和骑士诞生纪念章', powerLevel:'创世级（Zero-One+Zi-O，跨越时代的力量）', locations:'飞电智能公司, 九时五时堂, 时间管理局, 时代交汇点', villainDetail:'Finis(时间管理局): 时间管理局的成员，企图重置时间线，消灭令和时代。异类Zero-One(Another Zero-One): 被Finis创造的扭曲版Zero-One。', allVillains:'Finis(时间管理局): 时间管理局的成员，拥有操控时间线的能力。异类Zero-One(Another Zero-One): 被扭曲的Zero-One，拥有类似的力量。时间管理局: 企图控制时间线的神秘组织。', keywords:['令和','第一世代','Zero-One','Zi-O','时间线'], jp:{ series:'仮面ライダー令和 ザ・ファースト・ジェネレーション (Reiwa The First Generation)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーゼロワン(飛電或人)、仮面ライダージオウ(常磐ソウゴ)', belt:'飛電ゼロワンドライバー (Zero-One Driver)、ジクウドライバー (Ziku-Driver)', finishers:'ライジングインパクト (Rising Impact)、タイムブレーク (Time Break)', villains:'アナザーゼロワン (Another Zero-One)、フィーニス (Finis)', catchphrase:'令和の幕開け！(Reiwa no Makuake! 令和的开幕！)' } },
+      { id:'super-hero-taisen', year:'2012', name:'假面骑士×超级战队 超级英雄大战', sub:'超级英雄大战', involved:'Decade、Fourze、豪快红、全骑士、全战队', plot:'门矢士率领假面骑士军团与凯普特·玛贝拉斯率领的超级战队展开全面战争。两大特摄英雄集团的冲突背后，隐藏着邪恶组织"大残虐"企图毁灭所有英雄的阴谋。在激烈的战斗中，骑士与战队从对立走向理解，最终联手对抗真正的敌人。', villain:'大残虐、大首领', desc:'骑士VS战队！两大特摄英雄集团的历史性对决与联手', keyItems:'大修卡残党名单, 豪快红的海盗帽, 骑士战队联盟徽章', powerLevel:'创世级（全骑士+全战队集结，史上最大英雄联盟）', locations:'大修卡基地, 豪快帆船, 英雄战场, 骑士战队联盟总部', villainDetail:'大修卡(Dai-Shocker): 修卡的终极形态，联合了所有骑士系列的反派组织。豪快者海盗团: 与修卡对立的太空海盗（实为盟友）。', allVillains:'大修卡(Dai-Shocker): 修卡的终极形态，联合了所有骑士反派。修卡首领: 大修卡的最高统治者。大修卡干部: 来自各骑士系列的反派干部。修卡战斗员: 大修卡的基本战斗单位。', keywords:['超级英雄','大战','战队','Marvelous','DCD'], jp:{ series:'仮面ライダー×スーパー戦隊 スーパーヒーロー大戦 (Super Hero Taisen)', henshin:'変身！(Henshin! 变身！)', riders:'仮面ライダーディケイド(門矢士)、仮面ライダーフォーゼ(如月弦太朗)、仮面ライダーオーズ(火野映司)、ゴーカイレッド(キャプテン・マーベラス)', belt:'ディケイドライバー (Decadriver)、フォーゼドライバー (Fourze Driver)', finishers:'ディメンションキック (Dimension Kick)、ライダーロケットドリルキック (Rider Rocket Drill Kick)', villains:'大ショッカー (Dai-Shocker)、大ザンギャック (Dai-Zangyack)', catchphrase:'全ライダー×全戦隊！(Zen Rider × Zen Sentai! 全骑士×全战队！)' } },
+      { id:'super-hero-taisen-z', year:'2013', name:'假面骑士×超级战队×宇宙刑事 超级英雄大战Z', sub:'超级英雄大战Z', involved:'Wizard、兽电战队、宇宙刑事卡邦', plot:'宇宙犯罪组织"宇宙修卡"卷土重来，企图以"时空破灭装置"吞噬整个宇宙。假面骑士Wizard与兽电战队强龙者率先迎战，宇宙刑事卡邦也加入战局。三大特摄英雄首次同台，从各自的世界集结而来。', villain:'宇宙修卡、时空破灭装置', desc:'三大特摄英雄集结！骑士、战队、宇宙刑事共战宇宙修卡', keyItems:'宇宙修卡密令, 时空破灭装置碎片, 三大特摄英雄徽章', powerLevel:'创世级（Wizard+兽电战队+宇宙刑事，三大特摄英雄）', locations:'宇宙修卡要塞, 魔法师工坊, 兽电战队基地, 宇宙刑事总部', villainDetail:'宇宙修卡(Space Shocker): 修卡的宇宙分支，企图利用时空破灭装置消灭所有英雄。宇宙刑事联盟: 与骑士们联手对抗宇宙修卡。', allVillains:'宇宙修卡(Space Shocker): 修卡的宇宙分支，拥有宇宙级别的科技。宇宙修卡首领: 宇宙修卡的最高统治者。宇宙怪人: 宇宙修卡的各种外星怪人。时空破灭装置: 宇宙修卡的终极武器。', keywords:['宇宙修卡','Wizard','兽电战队','卡邦','三大特摄'] },
+      { id:'kamen-rider-taisen', year:'2014', name:'假面骑士大乱斗 假面骑士大战', sub:'平成骑士VS昭和骑士', involved:'铠武、1号、全平成骑士、全昭和骑士', plot:'在神秘组织"巴丹"的操纵下，平成骑士与昭和骑士之间爆发了前所未有的内战。葛叶纮汰与铠武站在平成骑士一方，而本乡猛的假面骑士1号则率领昭和骑士应战。两代骑士因理念不同而对立，最终跨越时代的骑士们放下分歧。', villain:'巴丹、暗影月亮', desc:'平成VS昭和！跨越时代的骑士内战与信念碰撞', keyItems:'巴丹秘密文件, 平成VS昭和纪念章, 暗影月亮之剑碎片', powerLevel:'创世级（全平成骑士+全昭和骑士，跨越时代的内战）', locations:'巴丹基地, 泽芽市, 昭和骑士遗迹, 平成VS昭和战场', villainDetail:'巴丹(Badan): 企图利用平成骑士和昭和骑士的内战来实现自己的邪恶计划。暗影月亮(Shadow Moon): 巴丹的盟友，拥有强大的力量。', allVillains:'巴丹(Badan): 邪恶组织，企图利用骑士内战来达成目的。暗影月亮(Shadow Moon): 强大的黑暗骑士，拥有帝王石的力量。巴丹怪人: 巴丹组织的各种怪人战士。巴丹首领: 巴丹的幕后统治者。', keywords:['平成VS昭和','铠武','1号','巴丹','内战'] },
+      { id:'kamen-rider-1-go', year:'2016', name:'假面骑士1号', sub:'假面骑士1号', involved:'假面骑士1号、Ghost、Specter', plot:'本乡猛在海外战斗多年后回到日本，却发现自己变成了一个被通缉的逃亡者。神秘组织"诺瓦·修卡"制造了新型改造人，并试图夺取本乡体内蕴藏的骑士力量。天空寺尊化身的Ghost在调查幽灵事件时与本乡相遇。', villain:'诺瓦·修卡、地狱大使', desc:'初代骑士归来！本乡猛燃烧生命的最终之战', keyItems:'诺瓦·修卡改造计划, 本乡猛的信件, 地狱大使的面具', powerLevel:'极高（假面骑士1号燃烧生命+Ghost无限魂）', locations:'诺瓦·修卡基地, 大天空寺, 本乡猛的隐居地, 东京街头', villainDetail:'诺瓦·修卡(Nova Shocker): 修卡的最新分支，企图利用本乡猛的基因创造终极改造人。地狱大使: 修卡的老牌干部，在诺瓦·修卡中复活。', allVillains:'诺瓦·修卡(Nova Shocker): 修卡的最新分支，拥有更先进的改造技术。地狱大使: 修卡的老牌干部，极其凶残的指挥官。诺瓦·修卡怪人: 诺瓦·修卡的各种改造怪人。诺瓦·修卡首领: 诺瓦·修卡的幕后统治者。', keywords:['假面骑士1号','本乡猛','诺瓦修卡','Ghost','传奇归来'] }
     ]
   }
 };
@@ -2709,7 +2753,6 @@ async function advancePlot() {
     if (affinityChanges) {
       affinityChanges.forEach(c => {
         updateNpcAffinity(c.name, c.val);
-        addMessage('system', '💕 好感度: ' + escHtml(c.name) + ' ' + (c.val > 0 ? '+' : '') + c.val);
       });
     }
     if (newWorldId) {
@@ -2738,6 +2781,8 @@ document.addEventListener('DOMContentLoaded', () => {
   loadSaveSlots();
   loadAchievements();
   renderPresets();
+  // 同步 era-tabs 与 currentEra（从存档恢复时可能不是默认的 showa）
+  syncEraTabs();
   renderWorldGrid();
   setupEraTabs();
   updateStatusBar();
@@ -2757,17 +2802,45 @@ function switchScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const screen = document.getElementById('screen-' + name);
   if (screen) screen.classList.add('active');
+  // Reset all footer nav buttons, then highlight the correct one for the active screen
   document.querySelectorAll('.footer-nav button').forEach(b => b.classList.remove('active'));
+  if (screen) {
+    const footerNav = screen.querySelector('.footer-nav');
+    if (footerNav) {
+      let targetBtn;
+      if (name === 'world') {
+        targetBtn = footerNav.querySelector('button[onclick*="goToWorldSelect"]');
+      } else {
+        targetBtn = footerNav.querySelector('button[onclick*="switchScreen"]');
+        // Narrow down to the specific button for this screen name
+        const buttons = footerNav.querySelectorAll('button[onclick*="switchScreen"]');
+        for (const btn of buttons) {
+          if (btn.getAttribute('onclick').includes("'" + name + "'")) {
+            targetBtn = btn;
+            break;
+          }
+        }
+      }
+      if (targetBtn) targetBtn.classList.add('active');
+    }
+  }
   updateStatusBar();
   if (name === 'world') renderWorldGrid();
 }
 
 function goToWorldSelect() {
   switchScreen('world');
+  syncEraTabs();
   renderWorldGrid();
 }
 
 // ==================== ERA TABS ====================
+function syncEraTabs() {
+  document.querySelectorAll('#era-tabs .era-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.era === currentEra);
+  });
+}
+
 function setupEraTabs() {
   document.querySelectorAll('#era-tabs .era-tab').forEach(tab => {
     tab.addEventListener('click', () => {
@@ -2842,6 +2915,14 @@ function showWorldDetail(world, era) {
         ${world.keywords.map(k => `<span class="tag tag-red">${k}</span>`).join(' ')}
       </div>
     </div>
+    ${world.keyItems ? `
+    <div class="card" style="border-color:rgba(201,168,76,0.4);">
+      <div class="card-title">🔑 关键道具</div>
+      <div class="card-desc" style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${world.keyItems.split(',').map(item => `<span class="tag tag-gold">${item.trim()}</span>`).join(' ')}
+      </div>
+      <div style="font-size:0.72em;color:var(--text-sub);margin-top:6px;">在冒险中可能遇到并收集这些标志性道具</div>
+    </div>` : ''}
     ${world.plot ? `
     <div class="card">
       <div class="card-title">📖 完整剧情</div>
@@ -2877,16 +2958,16 @@ function showWorldDetail(world, era) {
       <div class="card-title">💥 必杀技</div>
       <div class="card-desc">${world.finishers}</div>
     </div>` : '') : ''}
-    ${!isCrossover ? (world.allVillains ? `
+    ${world.allVillains ? `
     <div class="card">
       <div class="card-title">👹 全部反派</div>
       <div class="card-desc">${world.allVillains}</div>
-    </div>` : '') : ''}
-    ${!isCrossover ? (world.villainDetail ? `
+    </div>` : ''}
+    ${world.villainDetail ? `
     <div class="card">
       <div class="card-title">🏢 反派组织详情</div>
       <div class="card-desc">${world.villainDetail}</div>
-    </div>` : '') : ''}
+    </div>` : ''}
     ${world.allSupporting ? `
     <div class="card">
       <div class="card-title">👥 全部重要配角</div>
@@ -3190,6 +3271,7 @@ ${world.involved ? '- 涉及骑士/世界: ' + world.involved + '\n' : ''}${worl
 - 核心关键词: ${world.keywords.join('、')}
 ${world.powerLevel ? '- 战力等级: ' + world.powerLevel + '\n' : ''}${world.locations ? '- 重要地点: ' + world.locations + '\n' : ''}
 ${world.allRiders ? '- 全部骑士: ' + world.allRiders + '\n' : ''}${world.transformers ? '- 变身者详情: ' + world.transformers + '\n' : ''}${world.allForms ? '- 形态变化: ' + world.allForms + '\n' : ''}${world.belt ? '- 变身腰带: ' + world.belt + '\n' : ''}${world.vehicles ? '- 载具: ' + world.vehicles + '\n' : ''}${world.finishers ? '- 必杀技: ' + world.finishers + '\n' : ''}${world.allVillains ? '- 全部反派: ' + world.allVillains + '\n' : ''}${world.villainDetail ? '- 反派详情: ' + world.villainDetail + '\n' : ''}${world.allSupporting ? '- 全部重要配角: ' + world.allSupporting + '\n' : ''}${world.keyCharacters ? '- 关键角色: ' + world.keyCharacters + '\n' : ''}
+${world.keyItems ? '\n【关键道具】\n这个世界中存在以下标志性道具，玩家可以在冒险中遇到并收集：\n' + world.keyItems.split(',').map(item => '- ' + item.trim()).join('\n') + '\n你可以在适当的剧情节点引入这些道具。当玩家获得道具时，请使用inv_add标记将其加入物品栏。\n' : ''}
 ${world.jp ? '【日文术语参考】\n- 日文原名: ' + world.jp.series + '\n- 变身台词: ' + world.jp.henshin + '\n' + (world.jp.riders ? '- 骑士: ' + world.jp.riders + '\n' : '') + (world.jp.belt ? '- 腰带: ' + world.jp.belt + '\n' : '') + (world.jp.finishers ? '- 必杀技: ' + world.jp.finishers + '\n' : '') + (world.jp.villains ? '- 反派: ' + world.jp.villains + '\n' : '') + (world.jp.vehicles ? '- 载具: ' + world.jp.vehicles + '\n' : '') + (world.jp.catchphrase ? '- 经典台词: ' + world.jp.catchphrase + '\n' : '') + (world.jp.forms ? '- 形态: ' + world.jp.forms + '\n' : '') + (world.jp.combos ? '- 联组: ' + world.jp.combos + '\n' : '') + (world.jp.elements ? '- 元素: ' + world.jp.elements + '\n' : '') + (world.jp.arms ? '- 武装: ' + world.jp.arms + '\n' : '') + (world.jp.eyecons ? '- 眼魂: ' + world.jp.eyecons + '\n' : '') + (world.jp.gashats ? '- 卡带: ' + world.jp.gashats + '\n' : '') + (world.jp.bottles ? '- 满装瓶: ' + world.jp.bottles + '\n' : '') + (world.jp.keys ? '- 升华钥: ' + world.jp.keys + '\n' : '') + (world.jp.books ? '- 驱动书: ' + world.jp.books + '\n' : '') + (world.jp.stamps ? '- 印章: ' + world.jp.stamps + '\n' : '') + (world.jp.buckles ? '- 带扣: ' + world.jp.buckles + '\n' : '') + (world.jp.chemies ? '- 凯米: ' + world.jp.chemies + '\n' : '') + (world.jp.taros ? '- 异魔神: ' + world.jp.taros + '\n' : '') + (world.jp.codes ? '- 变身代码: ' + world.jp.codes + '\n' : '') + (world.jp.suits ? '- 花色: ' + world.jp.suits + '\n' : '') + (world.jp.fiveHands ? '- 五能手: ' + world.jp.fiveHands + '\n' : '') + (world.jp.cards ? '- 卡片: ' + world.jp.cards + '\n' : '') + (world.jp.switches ? '- 开关: ' + world.jp.switches + '\n' : '') + (world.jp.weapon ? '- 武器: ' + world.jp.weapon + '\n' : '') + (world.jp.shiftCars ? '- 移速小车: ' + world.jp.shiftCars + '\n' : '') + (world.jp.clockUp ? '- 加速: ' + world.jp.clockUp + '\n' : '') : ''}
 【玩家身份】
 玩家是${typeLabel}。
@@ -3315,6 +3397,70 @@ function resetChat() {
   toast('对话已重置');
 }
 
+function exportChatHistory() {
+  if (chatHistory.length === 0) { toast('暂无聊天记录可导出', 'error'); return; }
+  const worldName = selectedWorld ? selectedWorld.name : '未知世界';
+  const identityName = identityData?.name || '未知身份';
+  const dateStr = new Date().toLocaleString('zh-CN');
+  
+  // Build TXT format
+  let txt = `假面骑士文字冒险 - 聊天记录\n`;
+  txt += `========================================\n`;
+  txt += `世界: ${worldName}\n`;
+  txt += `身份: ${identityName}\n`;
+  txt += `导出时间: ${dateStr}\n`;
+  txt += `对话轮数: ${chatHistory.length}\n`;
+  txt += `========================================\n\n`;
+  
+  chatHistory.forEach(msg => {
+    const role = msg.role === 'user' ? '👤 你' : '🎭 GM';
+    txt += `${role}:\n${msg.content}\n\n`;
+  });
+  
+  const blob = new Blob(['\uFEFF' + txt], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `kamen-rider-chat-${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('聊天记录已导出为 TXT！');
+}
+
+function undoLastExchange() {
+  if (isLoading) { toast('请等待当前回复完成', 'error'); return; }
+  if (chatHistory.length === 0) { toast('没有可撤回的对话', 'error'); return; }
+  
+  let lastUserIdx = -1;
+  for (let i = chatHistory.length - 1; i >= 0; i--) {
+    if (chatHistory[i].role === 'user') { lastUserIdx = i; break; }
+  }
+  if (lastUserIdx === -1) { toast('没有可撤回的对话', 'error'); return; }
+  
+  const lastUserContent = chatHistory[lastUserIdx].content;
+  chatHistory.splice(lastUserIdx);
+  localStorage.setItem('kr_chat_history', JSON.stringify(chatHistory));
+  
+  // 从 DOM 中移除最后一个用户消息及其之后的所有消息
+  const container = document.getElementById('chat-messages');
+  const messages = container.querySelectorAll('.msg-user, .msg-ai, .msg-system');
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if (messages[i].classList.contains('msg-user')) {
+      let next = messages[i];
+      while (next) {
+        const toRemove = next;
+        next = next.nextElementSibling;
+        toRemove.remove();
+      }
+      break;
+    }
+  }
+  
+  document.getElementById('chat-input').value = lastUserContent;
+  document.getElementById('chat-input').focus();
+  toast('已撤回，可以重新输入');
+}
+
 function addMessage(role, content) {
   const container = document.getElementById('chat-messages');
   const cls = role === 'user' ? 'msg-user' : (role === 'system' ? 'msg-system' : 'msg-ai');
@@ -3418,7 +3564,6 @@ async function sendMessage() {
     if (affinityChanges) {
       affinityChanges.forEach(c => {
         updateNpcAffinity(c.name, c.val);
-        addMessage('system', '💕 好感度: ' + escHtml(c.name) + ' ' + (c.val > 0 ? '+' : '') + c.val);
       });
     }
     if (newWorldId) {
