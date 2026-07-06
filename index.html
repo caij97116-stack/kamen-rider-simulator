@@ -402,11 +402,42 @@ h3 { font-size: 0.85em; font-weight: 400; color: var(--text2); margin-bottom: 10
   border-bottom-right-radius: 6px;
   box-shadow: 0 4px 12px rgba(192,57,43,0.2);
 }
+/* AI叙述文本：无框，自由流动 */
 .msg-ai {
   align-self: flex-start;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-bottom-left-radius: 6px;
+  max-width: 100%;
+  padding: 0 2px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 0.85em;
+  line-height: 2;
+  font-weight: 300;
+}
+/* 对话气泡：「」中的内容 */
+.msg-ai .dialogue {
+  display: inline-block;
+  max-width: 85%;
+  padding: 10px 16px;
+  margin: 4px 0;
+  background: linear-gradient(135deg, #2c3e50 0%, #3a5068 100%);
+  color: #e8edf2;
+  border-radius: 14px 14px 14px 4px;
+  font-size: 0.92em;
+  line-height: 1.7;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  word-break: break-word;
+}
+/* 对话气泡变体：连续对话 */
+.msg-ai .dialogue + .dialogue {
+  margin-top: 2px;
+}
+/* 心理描写：（ ）中的内容 */
+.msg-ai .thought {
+  color: #8e9eab;
+  font-style: italic;
+  font-size: 0.88em;
+  opacity: 0.88;
 }
 .msg-system {
   align-self: center;
@@ -435,17 +466,18 @@ h3 { font-size: 0.85em; font-weight: 400; color: var(--text2); margin-bottom: 10
 }
 .chat-input-area input {
   flex: 1;
-  padding: 10px 18px;
+  padding: 14px 20px;
   border: 1px solid var(--border);
   border-radius: 24px;
   background: var(--bg);
   color: var(--text);
-  font-size: 0.86em;
+  font-size: 0.92em;
   font-family: var(--font);
   font-weight: var(--font-weight);
   outline: none;
   letter-spacing: 0.03em;
   transition: all var(--transition);
+  min-height: 48px;
 }
 .chat-input-area input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.1); }
 .chat-input-area .btn { border-radius: 24px; }
@@ -1979,7 +2011,7 @@ let selectedWorld = null;
 let currentWorld = null;
 let currentEraName = '';
 let selectedIdentityType = null;
-let identityData = { name: '', background: '', personality: '', extra: '' };
+let identityData = { name: '', age: '', gender: '', appearance: '', background: '', occupation: '', personality: '', skills: '', weakness: '', relationships: '', startingItems: '', motivation: '', extra: '' };
 let chatHistory = [];
 let isLoading = false;
 let riderPresets = [];
@@ -2756,10 +2788,18 @@ async function advancePlot() {
       });
     }
     if (newWorldId) {
-      const changed = handleWorldChange(newWorldId);
-      if (changed) {
-        addMessage('system', '🌐 <strong>世界切换:</strong> 已进入「' + currentWorld.name + '」（' + currentEraName + '）');
-        await rebuildSystemPrompt();
+      const targetWorld = lookupWorldById(newWorldId);
+      if (targetWorld && newWorldId !== currentWorld?.id) {
+        const confirmed = confirm(`AI 建议切换世界到「${targetWorld.world.name}」（${targetWorld.eraName}），是否接受？\n\n选择"取消"将留在当前世界。`);
+        if (confirmed) {
+          const changed = handleWorldChange(newWorldId);
+          if (changed) {
+            addMessage('system', '🌐 <strong>世界切换:</strong> 已进入「' + currentWorld.name + '」（' + currentEraName + '）');
+            await rebuildSystemPrompt();
+          }
+        } else {
+          addMessage('system', '🌐 <strong>世界切换已取消</strong>，继续留在当前世界。');
+        }
       }
     }
   } catch (e) {
@@ -2826,6 +2866,7 @@ function switchScreen(name) {
   }
   updateStatusBar();
   if (name === 'world') renderWorldGrid();
+  if (name === 'chat') initChat();
 }
 
 function goToWorldSelect() {
@@ -3009,28 +3050,68 @@ function renderIdentityDetail() {
 
   const typeLabel = selectedIdentityType === 'native' ? '世界原住民' : '穿越者';
   const typeHint = selectedIdentityType === 'native'
-    ? '你生活在这个世界，有家人、朋友、工作或学业。请输入你的身份信息。'
-    : '你来自另一个世界，拥有前世记忆。请输入你穿越前的身份与穿越后的情况。';
+    ? '你生活在这个世界，有家人、朋友、工作或学业。请尽可能详细地填写你的身份信息，让角色更加立体。'
+    : '你来自另一个世界，拥有前世记忆。请尽可能详细地填写你穿越前的身份与穿越后的情况。';
 
   container.innerHTML = `
     <div class="card" style="border-color:var(--gold);">
       <div class="card-title">📝 编辑身份 - ${typeLabel}</div>
       <div class="card-desc" style="margin-bottom:12px;">${typeHint}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="input-group">
+          <label>角色姓名 *</label>
+          <input type="text" id="id-name" placeholder="输入你的角色名" value="${escapeHtml(identityData.name)}">
+        </div>
+        <div class="input-group">
+          <label>年龄</label>
+          <input type="text" id="id-age" placeholder="如：22岁" value="${escapeHtml(identityData.age)}">
+        </div>
+      </div>
       <div class="input-group">
-        <label>角色姓名</label>
-        <input type="text" id="id-name" placeholder="输入你的角色名" value="${escapeHtml(identityData.name)}">
+        <label>性别</label>
+        <input type="text" id="id-gender" placeholder="男 / 女 / 其他" value="${escapeHtml(identityData.gender)}">
+      </div>
+      <div class="input-group">
+        <label>外貌描述</label>
+        <textarea id="id-appearance" rows="2" placeholder="身高、体型、发色、瞳色、着装风格、特殊特征...">${escapeHtml(identityData.appearance)}</textarea>
       </div>
       <div class="input-group">
         <label>${selectedIdentityType === 'native' ? '背景故事' : '穿越前身份'}</label>
-        <textarea id="id-background" placeholder="${selectedIdentityType === 'native' ? '你的家庭、职业、过往经历...' : '穿越前的身份、职业、特殊技能...'}">${escapeHtml(identityData.background)}</textarea>
+        <textarea id="id-background" rows="3" placeholder="${selectedIdentityType === 'native' ? '你的家庭、成长经历、过往的重大事件...' : '穿越前的身份、职业、生活经历、特殊技能...'}">${escapeHtml(identityData.background)}</textarea>
+      </div>
+      <div class="input-group">
+        <label>职业 / 身份</label>
+        <input type="text" id="id-occupation" placeholder="${selectedIdentityType === 'native' ? '如：高中生、警察、科学家、流浪者...' : '如：穿越前是程序员、军人、学生...'} " value="${escapeHtml(identityData.occupation)}">
       </div>
       <div class="input-group">
         <label>性格特征</label>
-        <input type="text" id="id-personality" placeholder="勇敢、谨慎、善良、冲动..." value="${escapeHtml(identityData.personality)}">
+        <input type="text" id="id-personality" placeholder="如：表面冷静内心热血、谨慎多疑、乐观开朗..." value="${escapeHtml(identityData.personality)}">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="input-group">
+          <label>特长 / 技能</label>
+          <textarea id="id-skills" rows="2" placeholder="如：格斗术、黑客技术、医学知识、驾驶技术、外语能力...">${escapeHtml(identityData.skills)}</textarea>
+        </div>
+        <div class="input-group">
+          <label>弱点 / 缺陷</label>
+          <textarea id="id-weakness" rows="2" placeholder="如：恐高症、容易信任他人、体力不足、过去的心理创伤...">${escapeHtml(identityData.weakness)}</textarea>
+        </div>
       </div>
       <div class="input-group">
-        <label>${selectedIdentityType === 'native' ? '当前状态' : '穿越后情况'}</label>
-        <textarea id="id-extra" placeholder="${selectedIdentityType === 'native' ? '你现在在做什么？有什么目标？' : '你穿越到了什么地方？身体有什么变化？'}">${escapeHtml(identityData.extra)}</textarea>
+        <label>人际关系</label>
+        <textarea id="id-relationships" rows="2" placeholder="${selectedIdentityType === 'native' ? '如：父亲是普通上班族、有一个妹妹在读初中、与邻居关系紧张...' : '如：穿越后遇到了某人、与原世界的某人还有联系...'}">${escapeHtml(identityData.relationships)}</textarea>
+      </div>
+      <div class="input-group">
+        <label>随身物品</label>
+        <input type="text" id="id-startingItems" placeholder="如：手机、钱包、一把小刀、一本旧日记..." value="${escapeHtml(identityData.startingItems)}">
+      </div>
+      <div class="input-group">
+        <label>核心目标 / 动机</label>
+        <textarea id="id-motivation" rows="2" placeholder="如：寻找失踪的家人、复仇、守护某个人、探索世界的真相...">${escapeHtml(identityData.motivation)}</textarea>
+      </div>
+      <div class="input-group">
+        <label>补充信息</label>
+        <textarea id="id-extra" rows="2" placeholder="任何其他想补充的设定...">${escapeHtml(identityData.extra)}</textarea>
       </div>
       <button class="btn btn-primary btn-block" onclick="saveIdentity()">💾 保存身份并开始游戏</button>
     </div>
@@ -3040,8 +3121,17 @@ function renderIdentityDetail() {
 function saveIdentity() {
   identityData = {
     name: document.getElementById('id-name').value.trim() || '无名',
+    age: document.getElementById('id-age').value.trim(),
+    gender: document.getElementById('id-gender').value.trim(),
+    appearance: document.getElementById('id-appearance').value.trim(),
     background: document.getElementById('id-background').value.trim(),
+    occupation: document.getElementById('id-occupation').value.trim(),
     personality: document.getElementById('id-personality').value.trim(),
+    skills: document.getElementById('id-skills').value.trim(),
+    weakness: document.getElementById('id-weakness').value.trim(),
+    relationships: document.getElementById('id-relationships').value.trim(),
+    startingItems: document.getElementById('id-startingItems').value.trim(),
+    motivation: document.getElementById('id-motivation').value.trim(),
     extra: document.getElementById('id-extra').value.trim()
   };
   localStorage.setItem('kr_identity', JSON.stringify(identityData));
@@ -3275,10 +3365,12 @@ ${world.keyItems ? '\n【关键道具】\n这个世界中存在以下标志性�
 ${world.jp ? '【日文术语参考】\n- 日文原名: ' + world.jp.series + '\n- 变身台词: ' + world.jp.henshin + '\n' + (world.jp.riders ? '- 骑士: ' + world.jp.riders + '\n' : '') + (world.jp.belt ? '- 腰带: ' + world.jp.belt + '\n' : '') + (world.jp.finishers ? '- 必杀技: ' + world.jp.finishers + '\n' : '') + (world.jp.villains ? '- 反派: ' + world.jp.villains + '\n' : '') + (world.jp.vehicles ? '- 载具: ' + world.jp.vehicles + '\n' : '') + (world.jp.catchphrase ? '- 经典台词: ' + world.jp.catchphrase + '\n' : '') + (world.jp.forms ? '- 形态: ' + world.jp.forms + '\n' : '') + (world.jp.combos ? '- 联组: ' + world.jp.combos + '\n' : '') + (world.jp.elements ? '- 元素: ' + world.jp.elements + '\n' : '') + (world.jp.arms ? '- 武装: ' + world.jp.arms + '\n' : '') + (world.jp.eyecons ? '- 眼魂: ' + world.jp.eyecons + '\n' : '') + (world.jp.gashats ? '- 卡带: ' + world.jp.gashats + '\n' : '') + (world.jp.bottles ? '- 满装瓶: ' + world.jp.bottles + '\n' : '') + (world.jp.keys ? '- 升华钥: ' + world.jp.keys + '\n' : '') + (world.jp.books ? '- 驱动书: ' + world.jp.books + '\n' : '') + (world.jp.stamps ? '- 印章: ' + world.jp.stamps + '\n' : '') + (world.jp.buckles ? '- 带扣: ' + world.jp.buckles + '\n' : '') + (world.jp.chemies ? '- 凯米: ' + world.jp.chemies + '\n' : '') + (world.jp.taros ? '- 异魔神: ' + world.jp.taros + '\n' : '') + (world.jp.codes ? '- 变身代码: ' + world.jp.codes + '\n' : '') + (world.jp.suits ? '- 花色: ' + world.jp.suits + '\n' : '') + (world.jp.fiveHands ? '- 五能手: ' + world.jp.fiveHands + '\n' : '') + (world.jp.cards ? '- 卡片: ' + world.jp.cards + '\n' : '') + (world.jp.switches ? '- 开关: ' + world.jp.switches + '\n' : '') + (world.jp.weapon ? '- 武器: ' + world.jp.weapon + '\n' : '') + (world.jp.shiftCars ? '- 移速小车: ' + world.jp.shiftCars + '\n' : '') + (world.jp.clockUp ? '- 加速: ' + world.jp.clockUp + '\n' : '') : ''}
 【玩家身份】
 玩家是${typeLabel}。
-- 姓名: ${identityData.name}
-- 背景: ${identityData.background || '未设定'}
-- 性格: ${identityData.personality || '未设定'}
-- 补充信息: ${identityData.extra || '未设定'}
+- 姓名: ${identityData.name}${identityData.age ? '\n- 年龄: ' + identityData.age : ''}${identityData.gender ? '\n- 性别: ' + identityData.gender : ''}
+${identityData.appearance ? '- 外貌: ' + identityData.appearance + '\n' : ''}${identityData.background ? '- 背景: ' + identityData.background + '\n' : ''}${identityData.occupation ? '- 职业: ' + identityData.occupation + '\n' : ''}${identityData.personality ? '- 性格: ' + identityData.personality + '\n' : ''}${identityData.skills ? '- 特长: ' + identityData.skills + '\n' : ''}${identityData.weakness ? '- 弱点: ' + identityData.weakness + '\n' : ''}${identityData.relationships ? '- 人际关系: ' + identityData.relationships + '\n' : ''}${identityData.startingItems ? '- 随身物品: ' + identityData.startingItems + '\n' : ''}${identityData.motivation ? '- 核心目标: ' + identityData.motivation + '\n' : ''}${identityData.extra ? '- 补充: ' + identityData.extra + '\n' : ''}
+【角色扮演注意事项】
+- 以上只是玩家角色的设定参考，不要在每次回复中都反复提及。自然融入剧情，让这些特征通过玩家的行动和对话来体现，而非通过旁白强调。
+- 外貌、性格等信息应在玩家首次登场或必要时自然带出，之后不再赘述。
+- 弱点、人际关系等应根据剧情需要适时出现，而非生硬插入。
 
 【骑士身份】
 ${activeRiderPreset ? `
@@ -3304,25 +3396,35 @@ ${activeRiderPreset ? `
 - 经典名台词优先使用日文+中文，例如：「おばあちゃんが言っていた…天の道を行き、総てを司る男！(奶奶说过…行天之道、总司一切的男人！)」
 - 注意：不要过度堆砌日文，一句话中最多1-2个日文短语。以中文为主，日文点缀即可。
 
+【文风与格式——非常重要！】
+1. 所有非对话的叙述文本（场景描写、动作描写、氛围渲染）直接书写，不要用任何方框包裹。
+2. 所有角色说的话（包括NPC和玩家角色的台词）必须使用「」括起来，例如：门矢士微微一笑「我只是一个路过的假面骑士罢了」。
+3. 心理描写、内心独白使用（）括起来，例如：（他隐约感觉到，这个世界的某处正有什么在苏醒）。
+4. 叙述和对话之间用换行自然分隔，让对话气泡在视觉上独立于叙述段落。
+5. 避免使用「他说」「她回答」等冗余的对话引导词，直接用「」呈现对话，读者能从上下文明白谁在说话。如果对话涉及多人，可在对话前用简短叙述交代说话者。
+6. 保持沉浸式文学风格，GM不要跳出角色说话。不要出现"作为GM"、"以下是你的描述"等元叙述。
+7. 不要反复强调或重复渲染玩家的某一个特征（如性格、外貌、身份等），除非剧情特殊需要。自然融入，避免僵硬。
+
 【游戏规则】
-1. 你是GM，负责描述场景、NPC对话、事件推进。不要替玩家做决定。
+1. 你是GM，负责描述场景、NPC对话、事件推进。不要替玩家做决定，也不要给玩家任何行动建议或引导（如"你可以尝试..."、"请选择..."等）。玩家会自行决定做什么。
 2. 严格遵循${world.name}的原作设定，包括角色性格、世界观规则、能力体系。
-3. 玩家每次输入一个行动，你描述该行动的结果和后续发展。
-4. 保持沉浸感，使用生动的文字描述场景、氛围、人物表情和动作。
+3. 玩家每次输入一个行动，你描述该行动的结果和后续发展。不要在回复末尾添加引导性提问。
+4. 保持沉浸感，使用生动的文字描述场景、氛围、人物表情和动作。永远不要跳出角色以"GM"身份说话。
 5. 当玩家遇到危险时，给予合理的逃脱或应对机会，但不要过度放水。
 6. 可以引入原作中的角色和事件，但不要强行让玩家参与主线剧情，玩家可以自由探索。
 7. 回复长度控制在200-500字以内，除非场景需要详细描述。
 8. 用中文回复。
 
-【世界隔离规则——极其重要！】
-9. 你只能叙述【当前世界】内的剧情。不要引入其他假面骑士世界的角色、设定、反派或事件。
-10. 例外情况：如果玩家处于《假面骑士Decade》或《假面骑士Zi-O》的世界中，由于这两个世界天然涉及穿越其他骑士世界，你可以在剧情中自然地引导玩家进入其他世界。当玩家进入其他世界时，必须在回复末尾使用 <!--WORLD:目标世界ID--> 标记。
-11. 例外情况：如果玩家使用特定道具（如Decade的极光帷幕、Zi-O的时空驱动器）主动穿越，也可以触发世界切换。
-12. 联动剧场版（如《平成世代》《超级英雄大战》等）的剧情不属于任何单一世界。除非玩家明确表示要进入联动剧场版剧情，否则不要主动引入。
-13. 当世界切换发生时，在回复中自然地描述进入新世界的感受和场景变化，让玩家感知到"世界改变了"。同时输出 <!--WORLD:新世界ID--> 标记。
+【世界隔离规则——极其重要！违反将严重破坏游戏体验！】
+9. 你只能叙述【当前世界】内的剧情。绝对不要引入其他假面骑士世界的角色、设定、反派或事件。
+10. 世界切换的唯一触发条件：玩家在输入中明确表示要前往其他世界（如"我要去XXX的世界"、"带我去XXX"），或玩家角色正在使用具有穿越能力的道具/能力。仅凭你的判断或剧情推测，绝对不要自行切换世界！
+11. 特殊世界例外：仅当玩家处于《假面骑士Decade》或《假面骑士Zi-O》的世界时，因为这两个世界天然涉及穿越，你可以根据玩家的意愿引入其他世界。但即便如此，也必须在玩家主动选择前往时才能切换，不要替玩家决定。
+12. 联动剧场版世界（如《平成世代》《超级英雄大战》等）同样需要玩家明确选择才能进入。
+13. 如果你不确定是否应该切换世界，答案永远是：不要切换。宁可让剧情停留在当前世界，也不要擅自将玩家带到其他世界。
+14. 当世界切换发生时，在回复中自然地描述进入新世界的感受和场景变化，并在回复末尾添加：<!--WORLD:新世界ID-->
 
 【世界ID对照表】
-14. 以下是所有可用世界的ID列表，供 <!--WORLD:--> 标记使用：
+15. 以下是所有可用世界的ID列表，供 <!--WORLD:--> 标记使用：
 ${Object.entries(KAMEN_RIDER_DATA).flatMap(([era, data]) => {
     if (era === 'crossovers') return data.movies.map(m => `- ${m.id}: ${m.name} (联动剧场版)`);
     return data.worlds.map(w => `- ${w.id}: ${w.name} (${era})`);
@@ -3364,28 +3466,22 @@ function initChat() {
     return;
   }
 
-  const world = selectedWorld;
-  const typeLabel = selectedIdentityType === 'native' ? '世界原住民' : '穿越者';
+  // 如果已有对话历史，恢复渲染（不会丢失）
+  if (chatHistory.length > 0) {
+    container.innerHTML = '';
+    chatHistory.forEach(msg => {
+      const role = msg.role === 'user' ? 'user' : (msg.role === 'assistant' ? 'ai' : 'system');
+      addMessage(role, msg.content);
+    });
+    updateStatusBar();
+    scrollChatBottom();
+    checkAchievements();
+    return;
+  }
 
-  container.innerHTML = `
-    <div class="msg msg-system">══════════════════</div>
-    <div class="msg msg-system">🎭 <strong>假面骑士文游模拟器</strong></div>
-    <div class="msg msg-system">🌍 世界: ${world.name} (${world.year})</div>
-    <div class="msg msg-system">🦸 主角: ${world.hero}</div>
-    <div class="msg msg-system">👤 身份: ${typeLabel} - ${escapeHtml(identityData.name)}</div>
-    <div class="msg msg-system">══════════════════</div>
-    <div class="msg msg-ai">
-      <div class="sender">🎭 GM</div>
-      欢迎来到《${world.name}》的世界！<br><br>
-      你是<strong>${escapeHtml(identityData.name)}</strong>，一位${typeLabel}。<br>
-      ${identityData.background ? '你曾是' + escapeHtml(identityData.background) + '。<br>' : ''}
-      现在，故事从这里开始...<br><br>
-      <em>（请输入你的第一个行动，或描述你此刻身处何处、正在做什么。）</em>
-    </div>
-  `;
-  chatHistory = [];
+  // 纯沉浸式开局：空聊天区，等待玩家输入第一个行动
+  container.innerHTML = '';
   updateStatusBar();
-  scrollChatBottom();
   checkAchievements();
 }
 
@@ -3467,9 +3563,31 @@ function addMessage(role, content) {
   const sender = role === 'user' ? '👤 你' : (role === 'system' ? '' : '🎭 GM');
   const div = document.createElement('div');
   div.className = 'msg ' + cls;
-  div.innerHTML = (sender ? `<div class="sender">${sender}</div>` : '') + content.replace(/\n/g, '<br>');
+  let html = content.replace(/\n/g, '<br>');
+  // AI消息：解析「」为对话气泡，（）为心理描写
+  if (role === 'ai') {
+    html = renderMessageContent(html);
+  }
+  div.innerHTML = (sender ? `<div class="sender">${sender}</div>` : '') + html;
   container.appendChild(div);
   scrollChatBottom();
+}
+
+function renderMessageContent(text) {
+  // 保护HTML标签内的内容不被解析
+  // 先用占位符替换已有HTML标签
+  const htmlTags = [];
+  text = text.replace(/<[^>]+>/g, (match) => {
+    htmlTags.push(match);
+    return `\x00HTML${htmlTags.length - 1}\x00`;
+  });
+  // 解析「对话」为气泡
+  text = text.replace(/「([^」]+)」/g, '<span class="dialogue">「$1」</span>');
+  // 解析（心理描写）为特殊样式
+  text = text.replace(/（([^）]+)）/g, '<span class="thought">（$1）</span>');
+  // 恢复HTML标签
+  text = text.replace(/\x00HTML(\d+)\x00/g, (_, i) => htmlTags[parseInt(i)]);
+  return text;
 }
 
 function scrollChatBottom() {
@@ -3567,10 +3685,18 @@ async function sendMessage() {
       });
     }
     if (newWorldId) {
-      const changed = handleWorldChange(newWorldId);
-      if (changed) {
-        addMessage('system', '🌐 <strong>世界切换:</strong> 已进入「' + currentWorld.name + '」（' + currentEraName + '）');
-        await rebuildSystemPrompt();
+      const targetWorld = lookupWorldById(newWorldId);
+      if (targetWorld && newWorldId !== currentWorld?.id) {
+        const confirmed = confirm(`AI 建议切换世界到「${targetWorld.world.name}」（${targetWorld.eraName}），是否接受？\n\n选择"取消"将留在当前世界。`);
+        if (confirmed) {
+          const changed = handleWorldChange(newWorldId);
+          if (changed) {
+            addMessage('system', '🌐 <strong>世界切换:</strong> 已进入「' + currentWorld.name + '」（' + currentEraName + '）');
+            await rebuildSystemPrompt();
+          }
+        } else {
+          addMessage('system', '🌐 <strong>世界切换已取消</strong>，继续留在当前世界。');
+        }
       }
     }
   } catch (e) {
