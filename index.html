@@ -6,7 +6,7 @@
 <title>假面骑士文游模拟器</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@300;400;600;700&family=ZCOOL+XiaoWei&family=Ma+Shan+Zheng&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@300;400;600;700&family=ZCOOL+XiaoWei&family=Ma+Shan+Zheng&family=Zhi+Mang+Xing&family=ZCOOL+QingKe+HuangYou&family=Long+Cang&family=Liu+Jian+Mao+Cao&family=Noto+Sans+HK:wght@300;400;500&family=Noto+Serif+HK:wght@300;400;600&family=LXGW+WenKai:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #0b0b0f;
@@ -115,6 +115,50 @@ body {
   font-weight: 300;
   opacity: 0.7;
 }
+
+/* Style & Length Panel */
+.style-panel-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px; cursor: pointer;
+  background: var(--bg2); border-bottom: 1px solid var(--border);
+  flex-shrink: 0; user-select: none; transition: background 0.2s;
+}
+.style-panel-bar:hover { background: var(--bg4); }
+.style-panel-bar .bar-icon { font-size: 1em; }
+.style-panel-bar .bar-label { font-size: 0.78em; color: var(--text2); flex: 1; }
+.style-panel-bar .bar-arrow { font-size: 0.7em; color: var(--text2); transition: transform 0.3s; }
+.style-panel-bar.open .bar-arrow { transform: rotate(180deg); }
+.style-panel { display: none; padding: 14px 16px; background: var(--bg2); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.style-panel.show { display: block; }
+.style-panel .section-label { font-size: 0.75em; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
+.style-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.style-tag {
+  padding: 5px 12px; border-radius: 14px; font-size: 0.75em;
+  border: 1px solid var(--border); background: var(--bg);
+  color: var(--text); cursor: pointer; transition: all 0.2s;
+}
+.style-tag:hover { border-color: var(--gold); color: var(--gold); }
+.style-tag.active { background: rgba(201,168,76,0.15); border-color: var(--gold); color: var(--gold); }
+.style-panel textarea {
+  width: 100%; padding: 10px 12px; border-radius: 8px; font-size: 0.8em;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text);
+  font-family: var(--font); resize: vertical; min-height: 48px; margin-bottom: 12px;
+}
+.style-panel textarea:focus { border-color: var(--gold); outline: none; }
+.length-tags { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.length-tag {
+  padding: 5px 12px; border-radius: 14px; font-size: 0.75em;
+  border: 1px solid var(--border); background: var(--bg);
+  color: var(--text); cursor: pointer; transition: all 0.2s;
+}
+.length-tag:hover { border-color: var(--accent); color: var(--accent); }
+.length-tag.active { background: rgba(255,152,0,0.12); border-color: var(--accent); color: var(--accent); }
+.length-custom {
+  width: 80px; padding: 5px 10px; border-radius: 14px; font-size: 0.75em;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text);
+  font-family: var(--font); text-align: center;
+}
+.length-custom:focus { border-color: var(--accent); outline: none; }
 
 /* Scrollable content */
 .scroll-area {
@@ -996,6 +1040,38 @@ h3 { font-size: 0.85em; font-weight: 400; color: var(--text2); margin-bottom: 10
     <div class="subtitle">文游模拟器</div>
   </div>
 
+  <!-- ===== STYLE PANEL ===== -->
+  <div class="style-panel-bar" id="style-panel-bar" onclick="toggleStylePanel()">
+    <span class="bar-icon">🎨</span>
+    <span class="bar-label" id="style-bar-label">文风设置（未设定）</span>
+    <span class="bar-arrow">▼</span>
+  </div>
+  <div class="style-panel" id="style-panel">
+    <div class="section-label">📝 文风预设（点击选择，可多选）</div>
+    <div class="style-tags" id="style-tags">
+      <span class="style-tag" data-tag="热血战斗" onclick="toggleStyleTag(this)">⚔️ 热血战斗</span>
+      <span class="style-tag" data-tag="悬疑推理" onclick="toggleStyleTag(this)">🔍 悬疑推理</span>
+      <span class="style-tag" data-tag="轻松日常" onclick="toggleStyleTag(this)">☕ 轻松日常</span>
+      <span class="style-tag" data-tag="悲壮史诗" onclick="toggleStyleTag(this)">🏛️ 悲壮史诗</span>
+      <span class="style-tag" data-tag="科幻冷峻" onclick="toggleStyleTag(this)">🤖 科幻冷峻</span>
+      <span class="style-tag" data-tag="黑暗残酷" onclick="toggleStyleTag(this)">🌑 黑暗残酷</span>
+      <span class="style-tag" data-tag="浪漫温情" onclick="toggleStyleTag(this)">🌸 浪漫温情</span>
+      <span class="style-tag" data-tag="幽默诙谐" onclick="toggleStyleTag(this)">😂 幽默诙谐</span>
+    </div>
+    <div class="section-label">✏️ 自定义文风指令（优先于预设）</div>
+    <textarea id="style-custom" placeholder="输入自定义文风指令，如：使用简洁有力的文字，减少修饰词，多用短句。注意描写环境氛围，增强画面感..." oninput="saveStyleSettings();updateStyleBarLabel()"></textarea>
+    <div class="section-label">📏 输出长度</div>
+    <div class="length-tags" id="length-tags">
+      <span class="length-tag" data-len="200" onclick="selectLengthTag(this)">200字</span>
+      <span class="length-tag" data-len="400" onclick="selectLengthTag(this)">400字</span>
+      <span class="length-tag active" data-len="600" onclick="selectLengthTag(this)">600字</span>
+      <span class="length-tag" data-len="1000" onclick="selectLengthTag(this)">1000字</span>
+      <span class="length-tag" data-len="1500" onclick="selectLengthTag(this)">1500字</span>
+      <span class="length-tag" data-len="2000" onclick="selectLengthTag(this)">2000字</span>
+      <input type="number" class="length-custom" id="length-custom" placeholder="自定义" min="50" max="4000" step="50" onchange="onLengthCustom()">
+    </div>
+  </div>
+
   <!-- ===== SCREEN 0: API SETTINGS ===== -->
   <div id="screen-settings" class="screen active">
     <div class="scroll-area">
@@ -1065,6 +1141,30 @@ h3 { font-size: 0.85em; font-weight: 400; color: var(--text2); margin-bottom: 10
           <div class="font-card" data-font="pingfang" onclick="switchFont('pingfang')">
             <div class="font-preview" style="font-family:'PingFang SC','Hiragino Sans GB',sans-serif;">假面骑士 文游模拟器</div>
             <div class="font-name">苹方</div>
+          </div>
+          <div class="font-card" data-font="qingke" onclick="switchFont('qingke')">
+            <div class="font-preview" style="font-family:'ZCOOL QingKe HuangYou',sans-serif;">假面骑士 文游模拟器</div>
+            <div class="font-name">站酷黄油</div>
+          </div>
+          <div class="font-card" data-font="longcang" onclick="switchFont('longcang')">
+            <div class="font-preview" style="font-family:'Long Cang',cursive;">假面骑士 文游模拟器</div>
+            <div class="font-name">龙藏手写</div>
+          </div>
+          <div class="font-card" data-font="liujian" onclick="switchFont('liujian')">
+            <div class="font-preview" style="font-family:'Liu Jian Mao Cao',cursive;">假面骑士 文游模拟器</div>
+            <div class="font-name">柳建草书</div>
+          </div>
+          <div class="font-card" data-font="noto-sans-hk" onclick="switchFont('noto-sans-hk')">
+            <div class="font-preview" style="font-family:'Noto Sans HK',sans-serif;">假面騎士 文遊模擬器</div>
+            <div class="font-name">思源黑體HK</div>
+          </div>
+          <div class="font-card" data-font="noto-serif-hk" onclick="switchFont('noto-serif-hk')">
+            <div class="font-preview" style="font-family:'Noto Serif HK',serif;">假面騎士 文遊模擬器</div>
+            <div class="font-name">思源宋體HK</div>
+          </div>
+          <div class="font-card" data-font="wenkai" onclick="switchFont('wenkai')">
+            <div class="font-preview" style="font-family:'LXGW WenKai',serif;">假面骑士 文游模拟器</div>
+            <div class="font-name">霞鹜文楷</div>
           </div>
         </div>
       </div>
@@ -1153,11 +1253,20 @@ h3 { font-size: 0.85em; font-weight: 400; color: var(--text2); margin-bottom: 10
           <span class="stat-value" id="stat-life">100/100</span>
           <div class="stat-bar-bg"><div class="stat-bar-fill life" id="stat-bar-life" style="width:100%"></div></div>
         </div>
+        <div class="stat-item" style="flex:0 0 auto;min-width:60px;">
+          <span class="stat-label">💰 金币</span>
+          <span class="stat-value" id="stat-gold" style="color:#ffd700;">0 G</span>
+        </div>
+        <div class="stat-item" style="flex:0 0 auto;min-width:80px;">
+          <span class="stat-label">🎒 物品</span>
+          <span class="stat-value" id="stat-inv-count" style="font-size:0.7em;">0件</span>
+        </div>
       </div>
       <div class="chat-input-area">
         <button class="btn btn-secondary btn-sm" onclick="advancePlot()" title="推进剧情" style="flex-shrink:0;">▶</button>
         <input type="text" id="chat-input" placeholder="输入你的行动..." onkeydown="if(event.key==='Enter')sendMessage()">
         <button class="btn btn-primary btn-sm" onclick="sendMessage()" style="flex-shrink:0;">发送</button>
+        <button class="btn btn-accent btn-sm" onclick="continueWriting()" title="续写" style="flex-shrink:0;">✍</button>
         <button class="btn btn-secondary btn-sm" onclick="undoLastExchange()" title="撤回最新一轮对话" style="flex-shrink:0;">↩</button>
         <button class="btn btn-gold btn-sm" onclick="toggleStatusPanel()" title="查看状态" style="flex-shrink:0;">📋</button>
         <button class="btn btn-accent btn-sm" onclick="openRiderPanel()" title="骑士身份" style="flex-shrink:0;">⚡</button>
@@ -1213,7 +1322,7 @@ h3 { font-size: 0.85em; font-weight: 400; color: var(--text2); margin-bottom: 10
 <div class="overlay-bg" id="rider-overlay-bg" onclick="if(event.target===this)closeRiderPanel()">
   <div class="overlay-panel overlay-panel-wide" id="rider-overlay-panel">
     <h3>⚡ 假面骑士身份</h3>
-    <p style="font-size:12px;color:var(--text-sub);margin:0 0 12px;">在此设定你的骑士身份，可用于当前或任何世界。最多保存10个预设。</p>
+    <p style="font-size:12px;color:var(--text-sub);margin:0 0 12px;">在此设定你的骑士身份，可用于当前或任何世界。最多保存20个预设。</p>
 
     <!-- Active Preset Display -->
     <div id="rider-active-bar" style="display:none;background:rgba(212,175,55,0.15);border:1px solid var(--accent);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:13px;">
@@ -1264,8 +1373,15 @@ h3 { font-size: 0.85em; font-weight: 400; color: var(--text2); margin-bottom: 10
 
     <!-- Preset List -->
     <div class="rider-preset-section">
-      <h4>📁 已保存预设（<span id="rider-preset-count">0</span>/10）</h4>
+      <h4>📁 已保存预设（<span id="rider-preset-count">0</span>/20）</h4>
       <div id="rider-preset-list" class="rider-preset-list"></div>
+    </div>
+
+    <!-- World Rider Log -->
+    <div class="rider-preset-section" style="margin-top:16px;">
+      <h4>🌍 变身记录（<span id="rider-log-count">0</span>）</h4>
+      <p style="font-size:11px;color:var(--text-sub);margin:0 0 8px;">在游戏中变身时自动记录，可随时点击激活</p>
+      <div id="world-rider-log"></div>
     </div>
 
     <button class="btn btn-secondary btn-block" onclick="closeRiderPanel()" style="margin-top:12px;">关闭</button>
@@ -2016,6 +2132,8 @@ let chatHistory = [];
 let isLoading = false;
 let riderPresets = [];
 let activeRiderPreset = null;
+let worldRiderLog = []; // 变身记录：{ worldId, worldName, riderName, forms, timestamp }
+let styleSettings = { tags: [], custom: '', outputLen: 600 }; // 文风设置
 let playerStats = {
   stamina: { current: 100, max: 100 },
   combat: { current: 10, max: 100 },
@@ -2036,7 +2154,13 @@ const FONT_PRESETS = {
   'xiaowei': { family: "'ZCOOL XiaoWei', 'Noto Serif SC', serif", weight: '400', weightBold: '400' },
   'mashan': { family: "'Ma Shan Zheng', 'KaiTi', cursive", weight: '400', weightBold: '400' },
   'zhimang': { family: "'Zhi Mang Xing', 'KaiTi', cursive", weight: '400', weightBold: '400' },
-  'pingfang': { family: "'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif", weight: '300', weightBold: '500' }
+  'pingfang': { family: "'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif", weight: '300', weightBold: '500' },
+  'qingke': { family: "'ZCOOL QingKe HuangYou', 'PingFang SC', sans-serif", weight: '400', weightBold: '400' },
+  'longcang': { family: "'Long Cang', 'KaiTi', cursive", weight: '400', weightBold: '400' },
+  'liujian': { family: "'Liu Jian Mao Cao', 'KaiTi', cursive", weight: '400', weightBold: '400' },
+  'noto-sans-hk': { family: "'Noto Sans HK', 'PingFang SC', 'Microsoft YaHei', sans-serif", weight: '300', weightBold: '500' },
+  'noto-serif-hk': { family: "'Noto Serif HK', 'STSong', 'SimSun', serif", weight: '300', weightBold: '600' },
+  'wenkai': { family: "'LXGW WenKai', 'KaiTi', 'STKaiti', serif", weight: '300', weightBold: '700' }
 };
 
 function switchFont(fontId) {
@@ -2055,6 +2179,98 @@ function switchFont(fontId) {
 function loadFont() {
   const saved = localStorage.getItem('kr_font') || 'noto-sans';
   switchFont(saved);
+}
+
+// ==================== STYLE & LENGTH PANEL ====================
+function toggleStylePanel() {
+  const panel = document.getElementById('style-panel');
+  const bar = document.getElementById('style-panel-bar');
+  const show = !panel.classList.contains('show');
+  if (show) { panel.classList.add('show'); bar.classList.add('open'); }
+  else { panel.classList.remove('show'); bar.classList.remove('open'); }
+}
+
+function toggleStyleTag(el) {
+  const tag = el.dataset.tag;
+  const idx = styleSettings.tags.indexOf(tag);
+  if (idx >= 0) { styleSettings.tags.splice(idx, 1); el.classList.remove('active'); }
+  else { styleSettings.tags.push(tag); el.classList.add('active'); }
+  saveStyleSettings();
+  updateStyleBarLabel();
+}
+
+function selectLengthTag(el) {
+  document.querySelectorAll('.length-tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('length-custom').value = '';
+  styleSettings.outputLen = parseInt(el.dataset.len);
+  saveStyleSettings();
+}
+
+function onLengthCustom() {
+  const val = parseInt(document.getElementById('length-custom').value);
+  if (val && val >= 50 && val <= 4000) {
+    document.querySelectorAll('.length-tag').forEach(t => t.classList.remove('active'));
+    styleSettings.outputLen = val;
+    saveStyleSettings();
+  }
+}
+
+function saveStyleSettings() {
+  styleSettings.custom = document.getElementById('style-custom')?.value || '';
+  localStorage.setItem('kr_style_settings', JSON.stringify(styleSettings));
+}
+
+function loadStyleSettings() {
+  const saved = localStorage.getItem('kr_style_settings');
+  if (saved) {
+    try { styleSettings = JSON.parse(saved); } catch(e) {}
+  }
+  // 恢复UI状态
+  const customEl = document.getElementById('style-custom');
+  if (customEl) customEl.value = styleSettings.custom || '';
+  // 恢复标签选中状态
+  document.querySelectorAll('.style-tag').forEach(el => {
+    if (styleSettings.tags.includes(el.dataset.tag)) el.classList.add('active');
+    else el.classList.remove('active');
+  });
+  // 恢复长度选择
+  document.querySelectorAll('.length-tag').forEach(el => {
+    if (parseInt(el.dataset.len) === styleSettings.outputLen) el.classList.add('active');
+    else el.classList.remove('active');
+  });
+  updateStyleBarLabel();
+}
+
+function updateStyleBarLabel() {
+  const label = document.getElementById('style-bar-label');
+  if (!label) return;
+  const parts = [];
+  if (styleSettings.tags.length > 0) parts.push('风格: ' + styleSettings.tags.join('+'));
+  if (styleSettings.custom) parts.push('自定义指令');
+  if (parts.length === 0) label.textContent = '文风设置（未设定）';
+  else label.textContent = parts.join(' | ');
+}
+
+function getStyleInstruction() {
+  if (styleSettings.custom) return styleSettings.custom;
+  if (styleSettings.tags.length === 0) return '';
+  const tagMap = {
+    '热血战斗': '使用热血激昂的文风，战斗描写要激烈、有冲击力，多用短句和拟声词，突出角色的斗志和必杀技的震撼力。',
+    '悬疑推理': '使用悬疑冷峻的文风，设置伏笔和线索，营造紧张诡谲的氛围，让读者不断猜测。描写细节要精准，节奏要紧凑。',
+    '轻松日常': '使用轻松温暖的文风，描写日常生活中的趣味细节，角色互动幽默自然，节奏舒缓，给读者温馨的阅读体验。',
+    '悲壮史诗': '使用宏大悲壮的文风，叙事要有史诗感，注重氛围渲染和情感铺垫，角色面临重大抉择，牺牲与荣耀交织。',
+    '科幻冷峻': '使用冷静理性的文风，注重科技感和设定逻辑，用精确的语言描述科幻元素，保持冷峻克制的叙事语调。',
+    '黑暗残酷': '使用黑暗压抑的文风，描写残酷的战斗和艰难的抉择，不回避血腥与牺牲，营造绝望中挣扎求生的氛围。',
+    '浪漫温情': '使用细腻柔美的文风，注重情感描写和氛围营造，角色之间的羁绊要温暖动人，即使是战斗也要有诗意。',
+    '幽默诙谐': '使用轻松幽默的文风，穿插诙谐的对话和有趣的场景，角色可以有反差萌，让读者在紧张中也能会心一笑。'
+  };
+  return styleSettings.tags.map(t => tagMap[t] || '').filter(Boolean).join(' ');
+}
+
+function getMaxTokens() {
+  // 粗略估算：中文约1.5字符/token，加上回复的额外开销
+  return Math.ceil(styleSettings.outputLen / 1.5) + 200;
 }
 
 // ==================== PLAYER STATS ====================
@@ -2135,6 +2351,11 @@ function renderStats() {
       else if (pct <= 50) barEl.classList.add('warn');
     }
   });
+  // 更新金币和物品栏
+  const goldEl = document.getElementById('stat-gold');
+  if (goldEl) goldEl.textContent = playerGold + ' G';
+  const invEl = document.getElementById('stat-inv-count');
+  if (invEl) invEl.textContent = playerInventory.length + '件';
 }
 
 function parseStatsFromResponse(text) {
@@ -2219,10 +2440,100 @@ function saveRiderPresetsToStorage() {
   localStorage.setItem('kr_rider_presets', JSON.stringify(riderPresets));
 }
 
+function loadWorldRiderLog() {
+  const saved = localStorage.getItem('kr_world_rider_log');
+  if (saved) { try { worldRiderLog = JSON.parse(saved); } catch(e) { worldRiderLog = []; } }
+}
+
+function saveWorldRiderLog() {
+  localStorage.setItem('kr_world_rider_log', JSON.stringify(worldRiderLog));
+}
+
+function checkAutoSaveRider(statChanges) {
+  if (!activeRiderPreset) return;
+  // 检测是否有战力提升（表示变身/战斗），或玩家输入中包含变身关键词
+  if (!statChanges || !statChanges.combat) return;
+  const world = currentWorld || selectedWorld;
+  if (!world) return;
+  // 检查是否已记录过（避免重复）
+  const existing = worldRiderLog.find(r => r.worldId === world.id && r.riderName === activeRiderPreset.name);
+  if (existing) return;
+  // 保存变身记录
+  worldRiderLog.push({
+    worldId: world.id,
+    worldName: world.name,
+    worldEra: currentEraName || '',
+    riderName: activeRiderPreset.name,
+    transformer: activeRiderPreset.transformer || '',
+    belt: activeRiderPreset.belt || '',
+    forms: activeRiderPreset.forms || '',
+    finisher: activeRiderPreset.finisher || '',
+    timestamp: new Date().toLocaleString('zh-CN')
+  });
+  saveWorldRiderLog();
+  addMessage('system', '⚡ <strong>变身记录已保存：</strong>' + activeRiderPreset.name + ' 在「' + world.name + '」中变身！');
+}
+
+function renderWorldRiderLog() {
+  const container = document.getElementById('world-rider-log');
+  if (!container) return;
+  if (worldRiderLog.length === 0) {
+    container.innerHTML = '<span style="color:var(--text2);">暂无变身记录</span>';
+    return;
+  }
+  container.innerHTML = worldRiderLog.map((r, i) => `
+    <div class="rider-log-entry" style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <strong style="color:var(--accent);">⚡ ${escapeHtml(r.riderName)}</strong>
+        <span style="font-size:0.75em;color:var(--text2);">${escapeHtml(r.timestamp)}</span>
+      </div>
+      <div style="font-size:0.82em;color:var(--text-sub);margin-top:4px;">
+        🌍 ${escapeHtml(r.worldName)}${r.worldEra ? ' · ' + escapeHtml(r.worldEra) : ''}
+        ${r.transformer ? ' | 变身者: ' + escapeHtml(r.transformer) : ''}
+        ${r.belt ? ' | 腰带: ' + escapeHtml(r.belt) : ''}
+        ${r.forms ? ' | 形态: ' + escapeHtml(r.forms) : ''}
+        ${r.finisher ? ' | 必杀技: ' + escapeHtml(r.finisher) : ''}
+      </div>
+      <button class="btn btn-accent btn-sm" style="margin-top:6px;font-size:0.7em;padding:4px 8px;" onclick="applyFromLog(${i})">⚡ 激活此骑士</button>
+    </div>
+  `).join('');
+}
+
+function applyFromLog(index) {
+  const log = worldRiderLog[index];
+  if (!log) return;
+  // 查找匹配的预设，或创建临时激活
+  const existingPreset = riderPresets.find(p => p.name === log.riderName);
+  if (existingPreset) {
+    activatePresetById(existingPreset.id);
+  } else {
+    // 从记录创建临时激活
+    activeRiderPreset = {
+      id: 'log_' + Date.now(),
+      name: log.riderName,
+      transformer: log.transformer,
+      belt: log.belt,
+      forms: log.forms,
+      finisher: log.finisher,
+      world: log.worldName,
+      vehicle: '',
+      desc: '（从变身记录激活）'
+    };
+    localStorage.setItem('kr_active_rider', JSON.stringify(activeRiderPreset));
+    refreshActiveBar();
+    refreshRiderPresetList();
+  }
+  toast('已激活「' + log.riderName + '」', 'success');
+  closeRiderPanel();
+}
+
 function openRiderPanel() {
   loadRiderPresets();
+  loadWorldRiderLog();
   refreshRiderPresetList();
   refreshActiveBar();
+  renderWorldRiderLog();
+  document.getElementById('rider-log-count').textContent = worldRiderLog.length;
   document.getElementById('rider-overlay-bg').classList.add('show');
 }
 
@@ -2264,7 +2575,7 @@ function clearRiderForm() {
 function saveRiderPreset() {
   const data = getRiderFormData();
   if (!data.name) { toast('请至少填写骑士名称', 'error'); return; }
-  if (riderPresets.length >= 10) { toast('最多保存10个预设，请先删除旧的', 'error'); return; }
+  if (riderPresets.length >= 20) { toast('最多保存20个预设，请先删除旧的', 'error'); return; }
   riderPresets.push(data);
   saveRiderPresetsToStorage();
   refreshRiderPresetList();
@@ -2746,7 +3057,7 @@ async function advancePlot() {
     const resp = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-      body: JSON.stringify({ model, messages, max_tokens: 800, temperature: 0.8 })
+      body: JSON.stringify({ model, messages, max_tokens: getMaxTokens(), temperature: 0.8 })
     });
 
     const loadingEl = document.getElementById('loading-msg');
@@ -2802,6 +3113,8 @@ async function advancePlot() {
         }
       }
     }
+    // 检测变身并自动保存
+    checkAutoSaveRider(statChanges);
   } catch (e) {
     const loadingEl = document.getElementById('loading-msg');
     if (loadingEl) loadingEl.remove();
@@ -2817,7 +3130,9 @@ document.addEventListener('DOMContentLoaded', () => {
   loadFont();
   loadSettings();
   loadRiderPresets();
+  loadWorldRiderLog();
   loadNpcAffinity();
+  loadStyleSettings();
   loadSaveSlots();
   loadAchievements();
   renderPresets();
@@ -3404,6 +3719,7 @@ ${activeRiderPreset ? `
 5. 避免使用「他说」「她回答」等冗余的对话引导词，直接用「」呈现对话，读者能从上下文明白谁在说话。如果对话涉及多人，可在对话前用简短叙述交代说话者。
 6. 保持沉浸式文学风格，GM不要跳出角色说话。不要出现"作为GM"、"以下是你的描述"等元叙述。
 7. 不要反复强调或重复渲染玩家的某一个特征（如性格、外貌、身份等），除非剧情特殊需要。自然融入，避免僵硬。
+${getStyleInstruction() ? '\n【文风指令——优先遵循！】\n' + getStyleInstruction() + '\n' : ''}
 
 【游戏规则】
 1. 你是GM，负责描述场景、NPC对话、事件推进。不要替玩家做决定，也不要给玩家任何行动建议或引导（如"你可以尝试..."、"请选择..."等）。玩家会自行决定做什么。
@@ -3412,7 +3728,7 @@ ${activeRiderPreset ? `
 4. 保持沉浸感，使用生动的文字描述场景、氛围、人物表情和动作。永远不要跳出角色以"GM"身份说话。
 5. 当玩家遇到危险时，给予合理的逃脱或应对机会，但不要过度放水。
 6. 可以引入原作中的角色和事件，但不要强行让玩家参与主线剧情，玩家可以自由探索。
-7. 回复长度控制在200-500字以内，除非场景需要详细描述。
+7. 回复长度控制在${styleSettings.outputLen}字以内，除非场景需要详细描述。
 8. 用中文回复。
 
 【世界隔离规则——极其重要！违反将严重破坏游戏体验！】
@@ -3557,6 +3873,110 @@ function undoLastExchange() {
   toast('已撤回，可以重新输入');
 }
 
+async function continueWriting() {
+  if (isLoading) return;
+  if (chatHistory.length === 0) { toast('暂无对话可续写', 'error'); return; }
+  if (!selectedWorld || !selectedIdentityType) { toast('请先选择世界和身份', 'error'); return; }
+  const apiKey = document.getElementById('api-key').value.trim();
+  if (!apiKey) { toast('请先配置API Key', 'error'); return; }
+
+  isLoading = true;
+  updateStatusBar();
+  document.getElementById('chat-input').disabled = true;
+
+  const loadingMsg = document.createElement('div');
+  loadingMsg.className = 'msg msg-ai';
+  loadingMsg.innerHTML = '<div class="sender">🎭 GM</div><span class="spinner" style="display:inline-block;"></span> 续写中...';
+  loadingMsg.id = 'loading-msg';
+  document.getElementById('chat-messages').appendChild(loadingMsg);
+  scrollChatBottom();
+
+  try {
+    const systemPrompt = buildSystemPrompt();
+    const continueCmd = '（请继续上文未完的内容，直接从断点处接着写，不要重复已写的内容，不要加任何开场白或总结。）';
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      ...chatHistory,
+      { role: 'user', content: continueCmd }
+    ];
+
+    const base = document.getElementById('api-base').value.trim();
+    const key = document.getElementById('api-key').value.trim();
+    const model = document.getElementById('api-model').value.trim();
+    const url = base.replace(/\/+$/, '') + '/chat/completions';
+
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({ model, messages, max_tokens: getMaxTokens(), temperature: 0.8 })
+    });
+
+    const loadingEl = document.getElementById('loading-msg');
+    if (loadingEl) loadingEl.remove();
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    const rawReply = data.choices?.[0]?.message?.content || '(空回复)';
+    const reply = cleanWorldMarker(cleanStatsMarker(cleanAffinityMarker(rawReply)));
+    const statChanges = parseStatsFromResponse(rawReply);
+    const newWorldId = parseWorldMarker(rawReply);
+
+    addMessage('ai', reply);
+    chatHistory.push({ role: 'assistant', content: reply });
+    localStorage.setItem('kr_chat_history', JSON.stringify(chatHistory));
+
+    if (statChanges) {
+      updateStats(statChanges);
+      const desc = [];
+      if (statChanges.stamina) desc.push('体力' + (statChanges.stamina > 0 ? '+' : '') + statChanges.stamina);
+      if (statChanges.combat) desc.push('战力' + (statChanges.combat > 0 ? '+' : '') + statChanges.combat);
+      if (statChanges.health) desc.push('健康' + (statChanges.health > 0 ? '+' : '') + statChanges.health);
+      if (statChanges.life) desc.push('生命' + (statChanges.life > 0 ? '+' : '') + statChanges.life);
+      if (statChanges.gold) desc.push('金币' + (statChanges.gold > 0 ? '+' : '') + statChanges.gold);
+      if (statChanges.inv_add) desc.push('获得: ' + statChanges.inv_add.replace(/\|/g, '、'));
+      if (statChanges.inv_remove) desc.push('失去: ' + statChanges.inv_remove.replace(/\|/g, '、'));
+      if (desc.length > 0) {
+        addMessage('system', '📊 <strong>状态更新:</strong> ' + desc.join(' | '));
+      }
+    }
+    const affinityChanges = parseAffinityFromResponse(rawReply);
+    if (affinityChanges) {
+      affinityChanges.forEach(c => updateNpcAffinity(c.name, c.val));
+    }
+    if (newWorldId) {
+      const targetWorld = lookupWorldById(newWorldId);
+      if (targetWorld && newWorldId !== currentWorld?.id) {
+        const confirmed = confirm(`AI 建议切换世界到「${targetWorld.world.name}」（${targetWorld.eraName}），是否接受？\n\n选择"取消"将留在当前世界。`);
+        if (confirmed) {
+          const changed = handleWorldChange(newWorldId);
+          if (changed) {
+            addMessage('system', '🌐 <strong>世界切换:</strong> 已进入「' + currentWorld.name + '」（' + currentEraName + '）');
+            await rebuildSystemPrompt();
+          }
+        } else {
+          addMessage('system', '🌐 <strong>世界切换已取消</strong>，继续留在当前世界。');
+        }
+      }
+    }
+    // 检测变身并自动保存
+    checkAutoSaveRider(statChanges);
+  } catch (e) {
+    const loadingEl = document.getElementById('loading-msg');
+    if (loadingEl) loadingEl.remove();
+    addMessage('system', '❌ 续写失败: ' + e.message);
+    toast('续写失败: ' + e.message, 'error');
+  }
+
+  isLoading = false;
+  document.getElementById('chat-input').disabled = false;
+  document.getElementById('chat-input').focus();
+  updateStatusBar();
+}
+
 function addMessage(role, content) {
   const container = document.getElementById('chat-messages');
   const cls = role === 'user' ? 'msg-user' : (role === 'system' ? 'msg-system' : 'msg-ai');
@@ -3641,7 +4061,7 @@ async function sendMessage() {
       body: JSON.stringify({
         model: model,
         messages: messages,
-        max_tokens: 800,
+        max_tokens: getMaxTokens(),
         temperature: 0.8
       })
     });
@@ -3699,6 +4119,8 @@ async function sendMessage() {
         }
       }
     }
+    // 检测变身并自动保存
+    checkAutoSaveRider(statChanges);
   } catch (e) {
     const loadingEl = document.getElementById('loading-msg');
     if (loadingEl) loadingEl.remove();
